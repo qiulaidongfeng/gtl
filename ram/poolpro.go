@@ -39,7 +39,7 @@ func (p *poolpro) Get() (interface{}, error) {
 	return p.pool.Get(), nil
 }
 
-func (p poolpro) TsLen() uint64 {
+func (p poolpro) Tslen() uint64 {
 	return atomic.LoadUint64(p.len)
 }
 

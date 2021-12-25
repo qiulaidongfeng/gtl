@@ -16,7 +16,7 @@ func oneinit(i int) {
 	}
 }
 
-func Benchmark_Poolpro_Len(b testing.B) {
+func Benchmark_Poolpro_Len(b *testing.B) {
 	b.SetBytes()
 	n := Newpoolpro()
 	b.ReportMetric()
@@ -25,7 +25,7 @@ func Benchmark_Poolpro_Len(b testing.B) {
 	}
 }
 
-func Benchmark_Poolpro_Tslen(b testing.B) {
+func Benchmark_Poolpro_Tslen(b *testing.B) {
 	b.SetBytes()
 	n := Newpoolpro()
 	b.ReportMetric()
@@ -34,7 +34,7 @@ func Benchmark_Poolpro_Tslen(b testing.B) {
 	}
 }
 
-func Benchmark_Poolpro_Newpoolpro(b testing.B) {
+func Benchmark_Poolpro_Newpoolpro(b *testing.B) {
 	b.SetBytes()
 	b.ReportMetric()
 	for i := 0; i < b.N; i++ {
@@ -42,7 +42,7 @@ func Benchmark_Poolpro_Newpoolpro(b testing.B) {
 	}
 }
 
-func Benchmark_Poolpro_Len(b testing.B) {
+func Benchmark_Poolpro_Len(b *testing.B) {
 	b.SetBytes()
 	n := Newpoolpro()
 	b.ReportMetric()
@@ -51,7 +51,7 @@ func Benchmark_Poolpro_Len(b testing.B) {
 	}
 }
 
-func Benchmark_Poolpro_Put(b testing.B) {
+func Benchmark_Poolpro_Put(b *testing.B) {
 	b.SetBytes()
 	n := Newpoolpro()
 	b.ReportMetric()
@@ -61,7 +61,7 @@ func Benchmark_Poolpro_Put(b testing.B) {
 	}
 }
 
-func Benchmark_Poolpro_Tsput(b testing.B) {
+func Benchmark_Poolpro_Tsput(b *testing.B) {
 	b.SetBytes()
 	n := Newpoolpro()
 	b.ReportMetric()
@@ -71,7 +71,7 @@ func Benchmark_Poolpro_Tsput(b testing.B) {
 	}
 }
 
-func Benchmark_Poolpro_Get(b testing.B) {
+func Benchmark_Poolpro_Get(b *testing.B) {
 	oneinit(100000)
 	b.SetBytes()
 	b.ReportMetric()
@@ -83,7 +83,7 @@ func Benchmark_Poolpro_Get(b testing.B) {
 	}
 }
 
-func Benchmark_Poolpro_Get(b testing.B) {
+func Benchmark_Poolpro_Get(b *testing.B) {
 	oneinit(100000)
 	b.SetBytes()
 	b.ReportMetric()
