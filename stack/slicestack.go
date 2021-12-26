@@ -20,8 +20,8 @@ func Newslicestack() slicestack {
 }
 
 func (s *slicestack) Push(x interface{}) {
-	s.slice = append(s.slice[:s.size], x)
-	s.size += 1
+	s.slice = append(s.slice[:(s.size+1)], x)
+	s.size++
 	return
 }
 
@@ -30,8 +30,8 @@ func (s *slicestack) Pop() (x interface{}, err error) {
 		err = errors.New("slicestack,Empty")
 		return x, err
 	}
-	s.size -= 1
 	x = s.slice[s.size]
+	s.size -= 1
 	return x, nil
 
 }
@@ -45,7 +45,7 @@ func (s *slicestack) Clear() {
 	s.size = 0
 }
 
-func (s *slicestack) Look(size uint64) (interface{}, error) {
+func (s slicestack) Look(size uint64) (interface{}, error) {
 	if s.size < size {
 		return nil, errors.New("Stack size exceeded")
 	}
