@@ -2,6 +2,7 @@
 package ram
 
 import (
+	. "gtl/ram"
 	"testing"
 )
 
@@ -17,54 +18,50 @@ func oneinit(i int) {
 }
 
 func Benchmark_Poolpro_Len(b *testing.B) {
-	b.SetBytes()
+	b.SetBytes(1)
 	n := Newpoolpro()
-	b.ReportMetric()
+	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		n.Len()
 	}
 }
 
 func Benchmark_Poolpro_Tslen(b *testing.B) {
-	b.SetBytes()
+	b.SetBytes(1)
 	n := Newpoolpro()
-	b.ReportMetric()
+	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		n.Tslen()
 	}
 }
 
 func Benchmark_Poolpro_Newpoolpro(b *testing.B) {
-	b.SetBytes()
-	b.ReportMetric()
+	b.SetBytes(1)
+	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		l := Newpoolpro()
-	}
-}
-
-func Benchmark_Poolpro_Len(b *testing.B) {
-	b.SetBytes()
-	n := Newpoolpro()
-	b.ReportMetric()
-	for i := 0; i < b.N; i++ {
-		n.Len()
+		_ = Newpoolpro()
 	}
 }
 
 func Benchmark_Poolpro_Put(b *testing.B) {
-	b.SetBytes()
+	b.SetBytes(1)
 	n := Newpoolpro()
-	b.ReportMetric()
+	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		var k int
-		n.put(k)
+		n.Put(k)
 	}
 }
 
 func Benchmark_Poolpro_Tsput(b *testing.B) {
-	b.SetBytes()
+	b.SetBytes(1)
 	n := Newpoolpro()
-	b.ReportMetric()
+	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		var k int
 		n.Tsput(k)
@@ -72,24 +69,27 @@ func Benchmark_Poolpro_Tsput(b *testing.B) {
 }
 
 func Benchmark_Poolpro_Get(b *testing.B) {
-	oneinit(100000)
-	b.SetBytes()
-	b.ReportMetric()
-	for i := 0; i < 100000; i++ {
-		face, err := p.Get()
+	oneinit(2)
+	b.SetBytes(1)
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < 2; i++ {
+		var err error
+		_, err = p.Get()
 		if err != nil {
 			panic(err)
 		}
 	}
 }
 
-func Benchmark_Poolpro_Get(b *testing.B) {
-	oneinit(100000)
-	b.SetBytes()
-	b.ReportMetric()
-	for i := 0; i < 100000; i++ {
-		p.Tsget()
-		face, err := p.Get()
+func Benchmark_Poolpro_Tsget(b *testing.B) {
+	oneinit(2)
+	b.SetBytes(1)
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < 2; i++ {
+		var err error
+		_, err = p.Tsget()
 		if err != nil {
 			panic(err)
 		}
