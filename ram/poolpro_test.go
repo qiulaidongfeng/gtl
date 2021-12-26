@@ -63,10 +63,10 @@ func Benchmark_Poolpro_Get(b *testing.B) {
 		h := i
 		p.Put(h)
 	}
-	b.SetBytes(1)
-	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
+		b.SetBytes(1)
+		b.ReportAllocs()
 		var err error
 		_, err = p.Get()
 		if err != nil {
@@ -81,10 +81,10 @@ func Benchmark_Poolpro_Tsget(b *testing.B) {
 		h := i
 		p.Put(h)
 	}
-	b.SetBytes(1)
-	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
+		b.SetBytes(1)
+		b.ReportAllocs()
 		var err error
 		_, err = p.Tsget()
 		if err != nil {
