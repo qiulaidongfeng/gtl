@@ -6,17 +6,6 @@ import (
 	"testing"
 )
 
-var (
-	p = Newpoolpro()
-)
-
-func oneinit(i int) {
-	for io := 0; io < i; i++ {
-		k := 90
-		p.Put(k)
-	}
-}
-
 func Benchmark_Poolpro_Len(b *testing.B) {
 	b.SetBytes(1)
 	n := Newpoolpro()
@@ -69,11 +58,15 @@ func Benchmark_Poolpro_Tsput(b *testing.B) {
 }
 
 func Benchmark_Poolpro_Get(b *testing.B) {
-	oneinit(2)
+	var p = Newpoolpro()
+	for i := 0; i < b.N; i++ {
+		h := i
+		p.Put(h)
+	}
 	b.SetBytes(1)
 	b.ReportAllocs()
 	b.ResetTimer()
-	for i := 0; i < 2; i++ {
+	for i := 0; i < b.N; i++ {
 		var err error
 		_, err = p.Get()
 		if err != nil {
@@ -83,11 +76,15 @@ func Benchmark_Poolpro_Get(b *testing.B) {
 }
 
 func Benchmark_Poolpro_Tsget(b *testing.B) {
-	oneinit(2)
+	var p = Newpoolpro()
+	for i := 0; i < b.N; i++ {
+		h := i
+		p.Put(h)
+	}
 	b.SetBytes(1)
 	b.ReportAllocs()
 	b.ResetTimer()
-	for i := 0; i < 2; i++ {
+	for i := 0; i < b.N; i++ {
 		var err error
 		_, err = p.Tsget()
 		if err != nil {
