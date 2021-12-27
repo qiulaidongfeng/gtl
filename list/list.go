@@ -1,18 +1,23 @@
 // list
 package list
 
-type Node interface {
-	Put(x interface{}) error
+type NoTsNode interface {
+	Set(x interface{}) error
 	Get() (interface{}, error)
-	Next() Node
-	Prev() Node
+	Next() *Node
+	Prev() *Node
 }
 
 type TsNode interface {
-	Tsput(x interface{}) error
+	Tsset(x interface{}) error
 	Tsget() (interface{}, error)
-	Tsnext() Node
-	Tsprev() Node
+	Tsnext() *Node
+	Tsprev() *Node
+}
+
+type Node interface {
+	NoTsNode
+	TsNode
 }
 
 type Simplelist interface {
@@ -29,7 +34,7 @@ type TsSimplelist interface {
 	Tsset(size uint64, x interface{}) error
 }
 
-type list interface {
+type NoTslist interface {
 	Simplelist
 	TsSimplelist
 	LnsertAt(size uint64, x Node) error
@@ -40,12 +45,18 @@ type list interface {
 }
 
 type Tslist interface {
-	list
+	Simplelist
+	TsSimplelist
 	TsLnsertAt(size uint64, x Node) error
 	TsRemoveAt(size uint64) error
 	Tslen() uint64
 	Tsclear()
 	TsString() string
+}
+
+type List interface {
+	NoTslist
+	Tslist
 }
 
 type Splist = Simplelist
