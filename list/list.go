@@ -24,14 +24,14 @@ type Simplelist interface {
 	Lnsert(x Node) error
 	Remove() error
 	Get(size uint64) (Node, error)
-	Set(size uint64, x interface{}) error
+	Set(size uint64, x Node) error
 }
 
 type TsSimplelist interface {
 	Tslnsert(x Node) error
 	Tsremove() error
 	Tsget(size uint64) (Node, error)
-	Tsset(size uint64, x interface{}) error
+	Tsset(size uint64, x Node) error
 }
 
 type NoTslist interface {
