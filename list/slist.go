@@ -3,6 +3,7 @@ package list
 
 import (
 	"errors"
+	"strings"
 	"sync"
 )
 
@@ -55,10 +56,12 @@ func (e *Element) Tsprev() (x *Node) {
 	return
 }
 
-type Slist struct {
+type SingleLinkedList struct {
 	node Element
 	len  uint64
 }
+
+type Slist = SingleLinkedList
 
 func NewSlist() Slist {
 	n := Slist{
@@ -94,10 +97,29 @@ func (s *Slist) Remove() error {
 	for i := 0; i < (s.len - 2); i++ {
 		next = &(s.node.NextOne)
 	}
-	*next = nil
+	*(*next) = nil
 	return nil
 }
 
 func (s *Slist) Get(size uint64) (Node, error) {
+	if size == 0 {
+		return nil, errors.New("When Slist is empty,size==0")
+	}
+	for i := 0; i < (size - 2); i++ {
+		next = &(s.node.NextOne)
+	}
+	return *(*next), nil
+}
 
+func (s *Slist) String() string {
+	var st strings.Builder
+	for i := 0; i < s.len; i++ {
+		value, err := s.Get((i + 1))
+		if err != nil {
+			panic(err)
+		}
+		st.WriteString(value)
+		st.WriteString("->")
+	}
+	return st.String()
 }
