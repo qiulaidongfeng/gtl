@@ -22,11 +22,11 @@ func (e *Element) Get() (interface{}, error) {
 	return e.value, nil
 }
 
-func (e *Element) Next() *Node {
-	return e.NextOne
+func (e *Element) Next() Node {
+	return (e.NextOne)
 }
 
-func (e *Element) Prev() *Node {
+func (e *Element) Prev() Node {
 	return nil
 }
 
@@ -44,14 +44,14 @@ func (e *Element) Tsget() (x interface{}, err error) {
 	return
 }
 
-func (e *Element) Tsnext() (x *Node) {
+func (e *Element) Tsnext() (x Node) {
 	e.mutex.RLock()
 	x = e.NextOne
 	e.mutex.RUnlock()
 	return
 }
 
-func (e *Element) Tsprev() (x *Node) {
+func (e *Element) Tsprev() (x Node) {
 	x = nil
 	return
 }
@@ -65,15 +65,14 @@ type Slist = SingleLinkedList
 
 func NewSlist() Slist {
 	n := Slist{
-		node: nil,
-		len:  0,
+		len: 0,
 	}
 	return n
 }
 
 func (s *Slist) Lnsert(x Node) error {
 	if s.len == 0 {
-		s.node = &x
+		s.node = x.(Element)
 		return nil
 	}
 	var (

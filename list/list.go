@@ -4,15 +4,15 @@ package list
 type NoTsNode interface {
 	Set(x interface{}) error
 	Get() (interface{}, error)
-	Next() *Node
-	Prev() *Node
+	Next() Node
+	Prev() Node
 }
 
 type TsNode interface {
 	Tsset(x interface{}) error
 	Tsget() (interface{}, error)
-	Tsnext() *Node
-	Tsprev() *Node
+	Tsnext() Node
+	Tsprev() Node
 }
 
 type Node interface {
