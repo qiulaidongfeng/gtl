@@ -3,6 +3,7 @@ package list
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"sync"
 )
@@ -22,11 +23,11 @@ func (e *Element) Get() (interface{}, error) {
 	return e.value, nil
 }
 
-func (e *Element) Next() Node {
-	return (e.NextOne)
+func (e *Element) Next() *Element {
+	return e.NextOne
 }
 
-func (e *Element) Prev() Node {
+func (e *Element) Prev() *Element {
 	return nil
 }
 
@@ -44,20 +45,24 @@ func (e *Element) Tsget() (x interface{}, err error) {
 	return
 }
 
-func (e *Element) Tsnext() (x Node) {
+func (e *Element) Tsnext() (x *Element) {
 	e.mutex.RLock()
 	x = e.NextOne
 	e.mutex.RUnlock()
 	return
 }
 
-func (e *Element) Tsprev() (x Node) {
+func (e *Element) Tsprev() (x *Element) {
 	x = nil
 	return
 }
 
+func (e *Element) String() string {
+	return fmt.Sprintf("%s", e.value)
+}
+
 type SingleLinkedList struct {
-	node Element
+	node *Element
 	len  uint64
 }
 
@@ -70,18 +75,27 @@ func NewSlist() Slist {
 	return n
 }
 
-func (s *Slist) Lnsert(x Node) error {
+func (s *Slist) Lnsert(x *Element) error {
 	if s.len == 0 {
-		s.node = x.(Element)
+		s.len++
+		s.node = x
 		return nil
 	}
-	var (
-		next *Element = nil
-	)
-	for i := 0; i < (s.len - 1); i++ {
-		next = &(s.node.NextOne)
+	if s.len == 1 {
+		s.len++
+		s.node = x
+		return nil
+	} else if s.len == 2 {
+		s.len++
+		s.node.NextOne = x
+		return nil
 	}
-	*next = &x
+	var next *Element
+	for i := uint64(0); i < (s.len - 2); i++ {
+		next = s.node.NextOne
+	}
+	next.NextOne = x
+	s.len++
 	return nil
 
 }
@@ -90,35 +104,58 @@ func (s *Slist) Remove() error {
 	if s.len == 0 {
 		return errors.New("Slist,Empty")
 	}
-	var (
-		next *Element = nil
-	)
-	for i := 0; i < (s.len - 2); i++ {
-		next = &(s.node.NextOne)
+	var next *Element = nil
+	if s.len == 1 {
+		s.len--
+		s.node = nil
+		return nil
+	} else if s.len == 2 {
+		s.len--
+		s.node.NextOne = nil
+		return nil
 	}
-	*(*next) = nil
+	for i := uint64(0); i < (s.len - 2); i++ {
+		next = s.node.NextOne
+	}
+	next.NextOne = nil
+	s.len--
 	return nil
 }
 
-func (s *Slist) Get(size uint64) (Node, error) {
+func (s *Slist) Get(size uint64) (*Element, error) {
 	if size == 0 {
 		return nil, errors.New("When Slist is empty,size==0")
 	}
-	for i := 0; i < (size - 2); i++ {
-		next = &(s.node.NextOne)
+	var next *Element
+	if size == 1 {
+		return s.node, nil
+	} else if s.len == 2 {
+		return s.node.NextOne, nil
 	}
-	return *(*next), nil
+	for i := uint64(0); i < (size - 2); i++ {
+		next = s.node.NextOne
+	}
+	return next, nil
 }
 
 func (s *Slist) String() string {
 	var st strings.Builder
-	for i := 0; i < s.len; i++ {
+	fmt.Println(s.len)
+	if s.len == 0 {
+		return ""
+	}
+	for i := uint64(0); i < s.len; i++ {
+		fmt.Println(i)
 		value, err := s.Get((i + 1))
 		if err != nil {
 			panic(err)
 		}
-		st.WriteString(value)
+		st.WriteString((*value).String())
 		st.WriteString("->")
 	}
 	return st.String()
+}
+
+func (s *Slist) Len() uint64 {
+	return s.len
 }
