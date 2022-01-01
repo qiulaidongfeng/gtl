@@ -83,15 +83,11 @@ func (s *Slist) Lnsert(x *Element) error {
 	}
 	if s.len == 1 {
 		s.len++
-		s.node = x
-		return nil
-	} else if s.len == 2 {
-		s.len++
 		s.node.NextOne = x
 		return nil
 	}
 	var next *Element
-	for i := uint64(0); i < (s.len - 2); i++ {
+	for i := uint64(0); i <= (s.len - 2); i++ {
 		next = s.node.NextOne
 	}
 	next.NextOne = x
@@ -109,12 +105,8 @@ func (s *Slist) Remove() error {
 		s.len--
 		s.node = nil
 		return nil
-	} else if s.len == 2 {
-		s.len--
-		s.node.NextOne = nil
-		return nil
 	}
-	for i := uint64(0); i < (s.len - 2); i++ {
+	for i := uint64(0); i <= (s.len - 2); i++ {
 		next = s.node.NextOne
 	}
 	next.NextOne = nil
@@ -129,10 +121,8 @@ func (s *Slist) Get(size uint64) (*Element, error) {
 	var next *Element
 	if size == 1 {
 		return s.node, nil
-	} else if s.len == 2 {
-		return s.node.NextOne, nil
 	}
-	for i := uint64(0); i < (size - 2); i++ {
+	for i := uint64(0); i <= (size - 2); i++ {
 		next = s.node.NextOne
 	}
 	return next, nil
