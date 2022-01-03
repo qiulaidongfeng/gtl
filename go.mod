@@ -1,2 +1,2 @@
-module github.com/qiulaidongfeng/gtl
+module gitee.com/qiulaidongfeng/gtl
 
