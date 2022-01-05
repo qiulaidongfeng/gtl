@@ -1,7 +1,6 @@
 package stack
 
 import (
-	"fmt"
 	. "gtl/stack"
 	"testing"
 )
@@ -58,10 +57,9 @@ func Benchmark_Tsclear(b *testing.B) {
 func Benchmark_Push(b *testing.B) {
 	b.SetBytes(2)
 	s := Newslicestack()
-	l := b.N
 	b.ReportAllocs()
 	b.ResetTimer()
-	for i := 0; i < l; i++ {
+	for i := 0; i < b.N; i++ {
 		s.Push(5326)
 	}
 }
@@ -69,27 +67,24 @@ func Benchmark_Push(b *testing.B) {
 func Benchmark_Tspush(b *testing.B) {
 	b.SetBytes(2)
 	s := Newslicestack()
-	l := b.N
 	b.ReportAllocs()
 	b.ResetTimer()
-	for i := 0; i < l; i++ {
+	for i := 0; i < b.N; i++ {
 		s.Tspush(5326)
 	}
 }
 
 func Benchmark_Pop(b *testing.B) {
 	s := Newslicestack()
-	k := b.N
 	var err error
-	for i := 0; i < k; i++ {
-		s.Push(5326)
-	}
+	b.ReportAllocs()
+	b.SetBytes(2)
 	b.ResetTimer()
-	for i := 0; i < k; i++ {
-		b.ReportAllocs()
-		b.SetBytes(2)
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		s.Push(5326)
+		b.StartTimer()
 		_, err = s.Pop()
-		fmt.Print("\r", err)
 		if err != nil {
 			panic(err)
 		}
@@ -98,17 +93,15 @@ func Benchmark_Pop(b *testing.B) {
 
 func Benchmark_Tspop(b *testing.B) {
 	s := Newslicestack()
-	k := b.N
 	var err error
-	for i := 0; i < k; i++ {
-		s.Push(5326)
-	}
 	b.ResetTimer()
-	for i := 0; i < k; i++ {
-		b.ReportAllocs()
-		b.SetBytes(2)
+	b.ReportAllocs()
+	b.SetBytes(2)
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		s.Push(5326)
+		b.StartTimer()
 		_, err = s.Tspop()
-		fmt.Print("\r", err)
 		if err != nil {
 			panic(err)
 		}
@@ -119,11 +112,13 @@ func Benchmark_Tspop(b *testing.B) {
 // 	s := Newslicestack()
 // 	b.ReportAllocs()
 // 	b.SetBytes(2)
+// 	b.ResetTimer()
 // 	var err error
+// 	b.StopTimer()
 // 	for i := 0; i < b.N; i++ {
 // 		s.Push(5326)
 // 	}
-// 	b.ResetTimer()
+// 	b.StartTimer()
 // 	for i := 0; i < b.N; i++ {
 // 		_, err = s.Look(6)
 // 		if err != nil {
