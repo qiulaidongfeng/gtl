@@ -79,11 +79,8 @@ func Benchmark_Pop(b *testing.B) {
 	var err error
 	b.ReportAllocs()
 	b.SetBytes(2)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		b.StopTimer()
-		s.Push(5326)
-		b.StartTimer()
+		s.Push(90)
 		_, err = s.Pop()
 		if err != nil {
 			panic(err)
@@ -94,13 +91,10 @@ func Benchmark_Pop(b *testing.B) {
 func Benchmark_Tspop(b *testing.B) {
 	s := Newslicestack()
 	var err error
-	b.ResetTimer()
 	b.ReportAllocs()
 	b.SetBytes(2)
 	for i := 0; i < b.N; i++ {
-		b.StopTimer()
-		s.Push(5326)
-		b.StartTimer()
+		s.Push(77)
 		_, err = s.Tspop()
 		if err != nil {
 			panic(err)
