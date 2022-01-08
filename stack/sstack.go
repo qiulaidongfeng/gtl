@@ -7,30 +7,30 @@ import (
 )
 
 const (
-	Int8code       int = int(unsafe.Sizeof(int8(1)))
-	Int16code      int = int(unsafe.Sizeof(int16(1)))
-	Int32code      int = int(unsafe.Sizeof(int32(1)))
-	Int64code      int = int(unsafe.Sizeof(int64(1)))
-	Intcode        int = int(unsafe.Sizeof(int(1)))
-	Uint8code      int = int(unsafe.Sizeof(uint8(1)))
-	Uint16code     int = int(unsafe.Sizeof(uint16(1)))
-	Uint32code     int = int(unsafe.Sizeof(uint32(1)))
-	Uint64code     int = int(unsafe.Sizeof(uint64(1)))
-	Uintcode       int = int(unsafe.Sizeof(uint(1)))
-	Bytecode       int = int(unsafe.Sizeof(byte(1)))
-	Runecode       int = int(unsafe.Sizeof(rune(1)))
-	Boolcode       int = int(unsafe.Sizeof(bool(true)))
-	Float32code    int = int(unsafe.Sizeof(float32(1.0)))
-	Float64code    int = int(unsafe.Sizeof(float64(2.0)))
-	Uintptrcode    int = int(unsafe.Sizeof(uintptr(7)))
-	Complex64code  int = int(unsafe.Sizeof(complex64(6 + 9i)))
-	Complex128code int = int(unsafe.Sizeof(complex128(8 + 9i)))
+	Int8code       uintptr = (unsafe.Sizeof(int8(1)))
+	Int16code      uintptr = (unsafe.Sizeof(int16(1)))
+	Int32code      uintptr = (unsafe.Sizeof(int32(1)))
+	Int64code      uintptr = (unsafe.Sizeof(int64(1)))
+	Intcode        uintptr = (unsafe.Sizeof(int(1)))
+	Uint8code      uintptr = (unsafe.Sizeof(uint8(1)))
+	Uint16code     uintptr = (unsafe.Sizeof(uint16(1)))
+	Uint32code     uintptr = (unsafe.Sizeof(uint32(1)))
+	Uint64code     uintptr = (unsafe.Sizeof(uint64(1)))
+	Uintcode       uintptr = (unsafe.Sizeof(uint(1)))
+	Bytecode       uintptr = (unsafe.Sizeof(byte(1)))
+	Runecode       uintptr = (unsafe.Sizeof(rune(1)))
+	Boolcode       uintptr = (unsafe.Sizeof(bool(true)))
+	Float32code    uintptr = (unsafe.Sizeof(float32(1.0)))
+	Float64code    uintptr = (unsafe.Sizeof(float64(2.0)))
+	Uintptrcode    uintptr = (unsafe.Sizeof(uintptr(7)))
+	Complex64code  uintptr = (unsafe.Sizeof(complex64(6 + 9i)))
+	Complex128code uintptr = (unsafe.Sizeof(complex128(8 + 9i)))
 )
 
 type GenericitySavememoryStack struct {
 	slice []int8
 	size  *uint64
-	slen  *uint64
+	scap  *uint64
 	mutex sync.RWMutex
 }
 
@@ -40,8 +40,9 @@ func NewGsstack() Sstack {
 	s := Sstack{
 		slice: make([]int8, 0, 2),
 		size:  new(uint64),
-		slen:  new(uint64),
+		scap:  new(uint64),
 	}
+	s.scap = 2
 	return s
 }
 
