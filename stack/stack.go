@@ -1,7 +1,7 @@
 package stack
 
 type TsStack interface {
-	Tspush(x interface{})
+	Tspush(x interface{}) error
 	Tspop() (interface{}, error)
 	Tssize() uint64
 	Tsclear()
@@ -9,7 +9,7 @@ type TsStack interface {
 }
 
 type NoTsStack interface {
-	Push(x interface{})
+	Push(x interface{}) error
 	Pop() (interface{}, error)
 	Size() uint64
 	Clear()
