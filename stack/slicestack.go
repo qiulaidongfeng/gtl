@@ -47,6 +47,7 @@ func (s *slicestack) Pop() (x interface{}, err error) {
 
 func (s *slicestack) Tspop() (x interface{}, err error) {
 	s.mutex.Lock()
+	atomic.AddUint64(s.size,^())
 	if *s.size == 0 {
 		err = errors.New("slicestack,Empty")
 		return x, err
