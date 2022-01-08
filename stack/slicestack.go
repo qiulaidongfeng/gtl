@@ -20,13 +20,13 @@ func Newslicestack() slicestack {
 	return s
 }
 
-func (s *slicestack) Push(x interface{}) {
+func (s *slicestack) Push(x interface{}) error{
 	s.slice = append(s.slice[:((*s.size)+1)], x)
 	*s.size++
-	return
+	return nil
 }
 
-func (s *slicestack) Tspush(x interface{}) {
+func (s *slicestack) Tspush(x interface{}) error{
 	s.mutex.Lock()
 	s.slice = append(s.slice[:((*s.size)+1)], x)
 	*s.size += 1
