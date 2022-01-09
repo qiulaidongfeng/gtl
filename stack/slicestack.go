@@ -20,18 +20,18 @@ func Newslicestack() slicestack {
 	return s
 }
 
-func (s *slicestack) Push(x interface{}) error{
+func (s *slicestack) Push(x interface{}) error {
 	s.slice = append(s.slice[:((*s.size)+1)], x)
 	*s.size++
 	return nil
 }
 
-func (s *slicestack) Tspush(x interface{}) error{
+func (s *slicestack) Tspush(x interface{}) error {
 	s.mutex.Lock()
 	s.slice = append(s.slice[:((*s.size)+1)], x)
 	*s.size += 1
 	s.mutex.Unlock()
-	return
+	return nil
 }
 
 func (s *slicestack) Pop() (x interface{}, err error) {
@@ -42,12 +42,10 @@ func (s *slicestack) Pop() (x interface{}, err error) {
 	x = s.slice[*s.size]
 	*s.size -= 1
 	return x, nil
-
 }
 
 func (s *slicestack) Tspop() (x interface{}, err error) {
 	s.mutex.Lock()
-	atomic.AddUint64(s.size,^())
 	if *s.size == 0 {
 		err = errors.New("slicestack,Empty")
 		return x, err
