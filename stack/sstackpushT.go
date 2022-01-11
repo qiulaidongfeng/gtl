@@ -91,7 +91,7 @@ func (s *GLMstack) TsPushint16(x int16) error {
 
 func (s *GLMstack) Pushint32(x int32) error {
 	if (*s.size)+Int32size >= (*s.scap) {
-		*s.scap = s.addcap(Int32size)
+		*s.scap = s.addcap(*s.size + Int32size)
 	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := (*s.size)
@@ -262,7 +262,7 @@ func (s *GLMstack) TsPushuint32(x uint32) error {
 	nsize := atomic.AddUint64(s.size, Uint32size)
 	if nsize >= *s.scap {
 		s.mutex.RUnlock()
-		*s.scap = s.Tsaddcap(Uint32size)
+		*s.scap = s.Tsaddcap(*s.scap + Uint32size)
 		s.mutex.RLock()
 	}
 	sp := unsafe.Pointer(&(s.slice[0]))
