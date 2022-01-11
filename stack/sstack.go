@@ -3,7 +3,6 @@ package stack
 
 import (
 	"sync"
-	"sync/atomic"
 	"unsafe"
 )
 
@@ -48,82 +47,42 @@ func NewGsstack() Sstack {
 	return s
 }
 
-func (s *Sstack) addcap() (ncap uint64) {
-	s.slice = append(s.slice, 2)
+func (s *Sstack) addcap(size uint64) (ncap uint64) {
 	ncap = uint64(cap(s.slice))
-	nslice := make([]int8, ncap, ncap)
-	for i := uint64(0); i < (*s.size); i++ {
-		nslice[i] = s.slice[i]
+	for ncap < size {
+		s.slice = append(s.slice, 2)
+		ncap = uint64(cap(s.slice))
+		nslice := make([]int8, ncap, ncap)
+		for i := uint64(0); i < (*s.size); i++ {
+			nslice[i] = s.slice[i]
+		}
+		s.slice = nslice
 	}
-	s.slice = nslice
 	return
 }
 
-func (s *Sstack) Tsaddcap() (ncap uint64) {
+func (s *Sstack) Tsaddcap(size uint64) (ncap uint64) {
 	s.mutex.Lock()
-	s.slice = append(s.slice, 9)
 	ncap = uint64(cap(s.slice))
-	nslice := make([]int8, ncap, ncap)
-	for i := uint64(0); i < (*s.size); i++ {
-		nslice[i] = s.slice[i]
+	for ncap < size {
+		s.slice = append(s.slice, 2)
+		ncap = uint64(cap(s.slice))
+		nslice := make([]int8, ncap, ncap)
+		for i := uint64(0); i < (*s.size); i++ {
+			nslice[i] = s.slice[i]
+		}
+		s.slice = nslice
 	}
-	s.slice = nslice
 	s.mutex.Unlock()
 	return
 }
 
-func (s *Sstack) Pushint8(x int8) error {
-	if (*s.size)+Int8size >= (*s.scap) {
-		*s.scap = s.addcap()
+func (s *Sstack) Push(ptr unsafe.Pointer, size uint64) error {
+	if (*s.size)+size >= (*s.scap) {
+		*s.scap = s.addcap(size)
 	}
-	s.slice[*s.size] = x
-	*s.size++
+	// fot i:=0;i<size;i++{
+	// 	s.slice[]=
+	// }
 	return nil
 }
-
-func (s *Sstack) TsPushint8(x int8) error {
-	s.mutex.RLock()
-	nsize := atomic.AddUint64(s.size, Int8size)
-	if nsize >= *s.scap {
-		s.mutex.RUnlock()
-		*s.scap = s.Tsaddcap()
-		s.mutex.RLock()
-	} else {
-		s.mutex.RUnlock()
-	}
-	s.slice[nsize] = x
-	return nil
-}
-
-func (s *Sstack) Pushint16(x int16) error {
-	if (*s.size)+Int16size >= (*s.scap) {
-		*s.scap = s.addcap()
-	}
-	sp := unsafe.Pointer(&(s.slice[0]))
-	sl := (*s.size)
-	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
-	sp2 := (*int16)(sp)
-	*sp2 = x
-	*s.size += Int16size
-	return nil
-}
-
-func (s *Sstack) Pushint32(x int32) {
-	if (*s.size)+Int32size >= (*s.scap) {
-		*s.scap = s.addcap()
-	}
-	sp := unsafe.Pointer(&(s.slice[0]))
-	sl := (*s.size)
-	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
-	sp2 := (*int32)(sp)
-	*sp2 = x
-	*s.size += Int32size
-	return nil
-}
-}
-
-// func (s *Sstack) Push(x interface{}, Type TypeCode) {
-// 	s.slice = append(s.slice[:((*s.size)+1)], x)
-// 	*s.size++
-// 	return
-// }
