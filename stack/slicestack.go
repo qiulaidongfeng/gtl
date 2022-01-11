@@ -1,7 +1,6 @@
 package stack
 
 import (
-	"errors"
 	"sync"
 	"sync/atomic"
 )
@@ -36,7 +35,7 @@ func (s *slicestack) Tspush(x interface{}) error {
 
 func (s *slicestack) Pop() (x interface{}, err error) {
 	if (*s.size) == 0 {
-		err = errors.New("slicestack,Empty")
+		err = StackEmpty
 		return x, err
 	}
 	x = s.slice[*s.size]
@@ -47,7 +46,7 @@ func (s *slicestack) Pop() (x interface{}, err error) {
 func (s *slicestack) Tspop() (x interface{}, err error) {
 	s.mutex.Lock()
 	if *s.size == 0 {
-		err = errors.New("slicestack,Empty")
+		err = StackEmpty
 		return x, err
 	}
 	x = s.slice[*s.size]
@@ -65,21 +64,23 @@ func (s *slicestack) Tssize() uint64 {
 	return atomic.LoadUint64(s.size)
 }
 
-func (s *slicestack) Clear() {
+func (s *slicestack) Clear() error {
 	s.slice = make([]interface{}, 0, 2)
 	*s.size = 0
+	return nil
 }
 
-func (s *slicestack) Tsclear() {
+func (s *slicestack) Tsclear() error {
 	s.mutex.Lock()
 	s.slice = make([]interface{}, 0, 2)
 	*s.size = 0
 	s.mutex.Unlock()
+	return nil
 }
 
 func (s slicestack) Look(size uint64) (interface{}, error) {
 	if *s.size < size {
-		return nil, errors.New("Stack size exceeded")
+		return nil, StackSizeExceeded
 	}
 	return s.slice[size], nil
 }
@@ -87,7 +88,7 @@ func (s slicestack) Look(size uint64) (interface{}, error) {
 func (s slicestack) Tslook(size uint64) (interface{}, error) {
 	s.mutex.Unlock()
 	if *s.size < size {
-		return nil, errors.New("Stack size exceeded")
+		return nil, StackSizeExceeded
 	}
 	s.mutex.RUnlock()
 	return s.slice[size], nil
