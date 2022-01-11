@@ -49,37 +49,43 @@ func NewGLMstack() GLMstack {
 
 func (s *GLMstack) addcap(size uint64) (ncap uint64) {
 	ncap = uint64(cap(s.slice))
-	for ncap < size {
-		s.slice = append(s.slice, 2)
-		ncap = uint64(cap(s.slice))
-		nslice := make([]int8, ncap, ncap)
-		for i := uint64(0); i < (*s.size); i++ {
-			nslice[i] = s.slice[i]
+	if ncap < 1024 {
+		ncap = ncap + ncap
+	} else {
+		for ncap < size {
+			ncap += ncap / 4
 		}
-		s.slice = nslice
 	}
+	nslice := make([]int8, ncap, ncap)
+	for i := uint64(0); i < (*s.size); i++ {
+		nslice[i] = s.slice[i]
+	}
+	s.slice = nslice
 	return
 }
 
 func (s *GLMstack) Tsaddcap(size uint64) (ncap uint64) {
 	s.mutex.Lock()
 	ncap = uint64(cap(s.slice))
-	for ncap < size {
-		s.slice = append(s.slice, 2)
-		ncap = uint64(cap(s.slice))
-		nslice := make([]int8, ncap, ncap)
-		for i := uint64(0); i < (*s.size); i++ {
-			nslice[i] = s.slice[i]
+	if ncap < 1024 {
+		ncap = ncap + ncap
+	} else {
+		for ncap < size {
+			ncap += ncap / 4
 		}
-		s.slice = nslice
 	}
+	nslice := make([]int8, ncap, ncap)
+	for i := uint64(0); i < (*s.size); i++ {
+		nslice[i] = s.slice[i]
+	}
+	s.slice = nslice
 	s.mutex.Unlock()
 	return
 }
 
 func (s *GLMstack) Push(ptr unsafe.Pointer, size uint64) error {
 	if (*s.size)+size >= (*s.scap) {
-		*s.scap = s.addcap(size)
+		*s.scap = s.addcap(*s.size + size)
 	}
 	for i := uint64(0); i < size; i++ {
 		size := (*s.size) + i
