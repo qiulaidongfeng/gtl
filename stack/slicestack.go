@@ -53,7 +53,6 @@ func (s *slicestack) Tspop() (x interface{}, err error) {
 	*s.size -= 1
 	s.mutex.Unlock()
 	return x, nil
-
 }
 
 func (s *slicestack) Size() uint64 {
