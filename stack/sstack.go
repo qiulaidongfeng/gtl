@@ -28,17 +28,17 @@ const (
 	Interfacesize  uint64 = uint64((unsafe.Sizeof(*(new(interface{})))))
 )
 
-type GenericitySavememoryStack struct {
+type GenericLowMemoryStack struct {
 	slice []int8
 	size  *uint64
 	scap  *uint64
 	mutex sync.RWMutex
 }
 
-type Sstack = GenericitySavememoryStack
+type GLMstack = GenericLowMemoryStack
 
-func NewGsstack() Sstack {
-	s := Sstack{
+func NewGLMstack() GLMstack {
+	s := GLMstack{
 		slice: make([]int8, 2, 2),
 		size:  new(uint64),
 		scap:  new(uint64),
@@ -47,7 +47,7 @@ func NewGsstack() Sstack {
 	return s
 }
 
-func (s *Sstack) addcap(size uint64) (ncap uint64) {
+func (s *GLMstack) addcap(size uint64) (ncap uint64) {
 	ncap = uint64(cap(s.slice))
 	for ncap < size {
 		s.slice = append(s.slice, 2)
@@ -61,7 +61,7 @@ func (s *Sstack) addcap(size uint64) (ncap uint64) {
 	return
 }
 
-func (s *Sstack) Tsaddcap(size uint64) (ncap uint64) {
+func (s *GLMstack) Tsaddcap(size uint64) (ncap uint64) {
 	s.mutex.Lock()
 	ncap = uint64(cap(s.slice))
 	for ncap < size {
@@ -77,12 +77,15 @@ func (s *Sstack) Tsaddcap(size uint64) (ncap uint64) {
 	return
 }
 
-func (s *Sstack) Push(ptr unsafe.Pointer, size uint64) error {
+func (s *GLMstack) Push(ptr unsafe.Pointer, size uint64) error {
 	if (*s.size)+size >= (*s.scap) {
 		*s.scap = s.addcap(size)
 	}
-	// fot i:=0;i<size;i++{
-	// 	s.slice[]=
-	// }
+	for i := uint64(0); i < size; i++ {
+		size := (*s.size) + i
+		value := *(*int8)(unsafe.Pointer(uintptr(ptr) + uintptr(i)))
+		s.slice[size] = value
+	}
+	*s.size += size
 	return nil
 }
