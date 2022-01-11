@@ -30,21 +30,19 @@ const (
 )
 
 type GenericitySavememoryStack struct {
-	slice  []int8
-	size   *uint64
-	scap   *uint64
-	bmutex bool
-	mutex  sync.RWMutex
+	slice []int8
+	size  *uint64
+	scap  *uint64
+	mutex sync.RWMutex
 }
 
 type Sstack = GenericitySavememoryStack
 
 func NewGsstack() Sstack {
 	s := Sstack{
-		slice:  make([]int8, 2, 2),
-		size:   new(uint64),
-		scap:   new(uint64),
-		bmutex: false,
+		slice: make([]int8, 2, 2),
+		size:  new(uint64),
+		scap:  new(uint64),
 	}
 	*s.scap = 2
 	return s
@@ -54,7 +52,7 @@ func (s *Sstack) addcap() (ncap uint64) {
 	s.slice = append(s.slice, 2)
 	ncap = uint64(cap(s.slice))
 	nslice := make([]int8, ncap, ncap)
-	for i := uint64(0); i < (ncap - 1); i++ {
+	for i := uint64(0); i < (*s.size); i++ {
 		nslice[i] = s.slice[i]
 	}
 	s.slice = nslice
@@ -66,9 +64,10 @@ func (s *Sstack) Tsaddcap() (ncap uint64) {
 	s.slice = append(s.slice, 9)
 	ncap = uint64(cap(s.slice))
 	nslice := make([]int8, ncap, ncap)
-	for i := uint64(0); i < (ncap - 1); i++ {
+	for i := uint64(0); i < (*s.size); i++ {
 		nslice[i] = s.slice[i]
 	}
+	s.slice = nslice
 	s.mutex.Unlock()
 	return
 }
@@ -110,7 +109,17 @@ func (s *Sstack) Pushint16(x int16) error {
 }
 
 func (s *Sstack) Pushint32(x int32) {
-
+	if (*s.size)+Int32size >= (*s.scap) {
+		*s.scap = s.addcap()
+	}
+	sp := unsafe.Pointer(&(s.slice[0]))
+	sl := (*s.size)
+	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
+	sp2 := (*int32)(sp)
+	*sp2 = x
+	*s.size += Int32size
+	return nil
+}
 }
 
 // func (s *Sstack) Push(x interface{}, Type TypeCode) {
