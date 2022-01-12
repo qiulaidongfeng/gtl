@@ -550,7 +550,7 @@ func (s *GLMstack) PushInterface(x interface{}) error {
 	return nil
 }
 
-func (s *GLMstack) TsPushInterface(x complex64) error {
+func (s *GLMstack) TsPushInterface(x interface{}) error {
 	s.mutex.RLock()
 	nsize := atomic.AddUint64(s.size, Interfacesize)
 	if nsize >= *s.scap {
