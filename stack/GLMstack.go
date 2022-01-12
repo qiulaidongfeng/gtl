@@ -2,6 +2,7 @@
 package stack
 
 import (
+	"reflect"
 	"sync"
 	"sync/atomic"
 	"unsafe"
@@ -84,7 +85,108 @@ func (s *GLMstack) Tsaddcap(size uint64) (ncap uint64) {
 	return
 }
 
-func (s *GLMstack) Push(ptr unsafe.Pointer, size uint64) error {
+func (s *GLMstack) Push(x interface{}) error {
+	kind := reflect.ValueOf(x).Kind()
+	if kind >= reflect.Int && kind <= reflect.Int64 {
+		switch Type := x.(type) {
+		case int:
+			err := s.Pushint(Type)
+			if err != nil {
+				return err
+			}
+		case int64:
+			err := s.Pushint64(Type)
+			if err != nil {
+				return err
+			}
+		case int32:
+			err := s.Pushint32(Type)
+			if err != nil {
+				return err
+			}
+		case int8:
+			err := s.Pushint8(Type)
+			if err != nil {
+				return err
+			}
+		case int16:
+			err := s.Pushint16(Type)
+			if err != nil {
+				return err
+			}
+		}
+	} else if kind == reflect.Bool {
+		Type := x.(bool)
+		s.PushBool(Type)
+	} else if kind >= reflect.Uint && kind <= reflect.Uint64 {
+		switch Type := x.(type) {
+		case uint:
+			err := s.Pushuint(Type)
+			if err != nil {
+				return err
+			}
+		case uint64:
+			err := s.Pushuint64(Type)
+			if err != nil {
+				return err
+			}
+		case uint32:
+			err := s.Pushuint32(Type)
+			if err != nil {
+				return err
+			}
+		case uint8:
+			err := s.Pushuint8(Type)
+			if err != nil {
+				return err
+			}
+		case uint16:
+			err := s.Pushuint16(Type)
+			if err != nil {
+				return err
+			}
+		}
+	} else if kind >= reflect.Float32 && kind <= reflect.Float64 {
+		switch Type := x.(type) {
+		case float32:
+			err := s.PushFloat32(Type)
+			if err != nil {
+				return err
+			}
+		case float64:
+			err := s.PushFloat64(Type)
+			if err != nil {
+				return err
+			}
+		}
+	} else if kind == reflect.Interface {
+		s.PushInterface(x)
+	} else if kind == reflect.Uintptr {
+		Type := x.(uintptr)
+		err := s.PushUintptr(Type)
+		if err != nil {
+			return err
+		}
+	} else if kind >= reflect.Complex64 && kind < reflect.Complex128 {
+		switch Type := x.(type) {
+		case complex64:
+			err := s.PushComplex64(Type)
+			if err != nil {
+				return err
+			}
+		case complex128:
+			err := s.PushComplex128(Type)
+			if err != nil {
+				return err
+			}
+		}
+	} else {
+		return StackPushFail
+	}
+	return StackPushFail
+}
+
+func (s *GLMstack) Pushptr(ptr unsafe.Pointer, size uint64) error {
 	if (*s.size)+size >= (*s.scap) {
 		*s.scap = s.addcap(*s.size + size)
 	}
@@ -97,7 +199,7 @@ func (s *GLMstack) Push(ptr unsafe.Pointer, size uint64) error {
 	return nil
 }
 
-func (s *GLMstack) TsPush(ptr unsafe.Pointer, size uint64) error {
+func (s *GLMstack) TsPushptr(ptr unsafe.Pointer, size uint64) error {
 	s.mutex.RLock()
 	if (*s.size)+size >= (*s.scap) {
 		s.mutex.RUnlock()
@@ -112,5 +214,29 @@ func (s *GLMstack) TsPush(ptr unsafe.Pointer, size uint64) error {
 		s.slice[sizei] = value
 	}
 	s.mutex.RUnlock()
+	return nil
+}
+
+func (s *GLMstack) Size() uint64 {
+	return *s.size
+}
+
+func (s *GLMstack) Tssize() uint64 {
+	return atomic.LoadUint64(s.size)
+}
+
+func (s *GLMstack) Clear() error {
+	*s.scap = 2
+	*s.size = 2
+	s.slice = make([]int8, 2, 2)
+	return nil
+}
+
+func (s *GLMstack) Tsclear() error {
+	s.mutex.Lock()
+	*s.scap = 2
+	*s.size = 2
+	s.slice = make([]int8, 2, 2)
+	s.mutex.Unlock()
 	return nil
 }
