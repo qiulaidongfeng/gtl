@@ -3,6 +3,7 @@ package stack
 
 import (
 	"sync"
+	"sync/atomic"
 	"unsafe"
 )
 
@@ -49,10 +50,10 @@ func NewGLMstack() GLMstack {
 
 func (s *GLMstack) addcap(size uint64) (ncap uint64) {
 	ncap = uint64(cap(s.slice))
-	if ncap < 1024 {
-		ncap = ncap + ncap
-	} else {
-		for ncap < size {
+	for ncap <= size {
+		if ncap < 1024 {
+			ncap += ncap
+		} else {
 			ncap += ncap / 4
 		}
 	}
@@ -67,10 +68,10 @@ func (s *GLMstack) addcap(size uint64) (ncap uint64) {
 func (s *GLMstack) Tsaddcap(size uint64) (ncap uint64) {
 	s.mutex.Lock()
 	ncap = uint64(cap(s.slice))
-	if ncap < 1024 {
-		ncap = ncap + ncap
-	} else {
-		for ncap < size {
+	for ncap <= size {
+		if ncap < 1024 {
+			ncap += ncap
+		} else {
 			ncap += ncap / 4
 		}
 	}
@@ -93,5 +94,23 @@ func (s *GLMstack) Push(ptr unsafe.Pointer, size uint64) error {
 		s.slice[size] = value
 	}
 	*s.size += size
+	return nil
+}
+
+func (s *GLMstack) TsPush(ptr unsafe.Pointer, size uint64) error {
+	s.mutex.RLock()
+	if (*s.size)+size >= (*s.scap) {
+		s.mutex.RUnlock()
+		*s.scap = s.addcap(*s.size + size)
+		s.mutex.RLock()
+	}
+	sizeold := atomic.AddUint64(s.size, size)
+	sizeold = atomic.AddUint64(&sizeold, ^uint64((*s.size)-1))
+	for i := uint64(0); i < size; i++ {
+		sizei := sizeold + i
+		value := *(*int8)(unsafe.Pointer(uintptr(ptr) + uintptr(i)))
+		s.slice[sizei] = value
+	}
+	s.mutex.RUnlock()
 	return nil
 }
