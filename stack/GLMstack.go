@@ -340,3 +340,33 @@ func (s *GLMstack) Tsclear() error {
 	s.mutex.Unlock()
 	return nil
 }
+
+func (s *GLMstack) Popptr(ptr *unsafe.Pointer, size uint64) error {
+	v := make([]int8, size, size)
+	sizei := s.size - size
+	vptr := uintptr(unsafe.Pointer(&s.slice[0])) + uintptr(sizei)
+	for i := uint64(0); i < size; i++ {
+		v[i] = *(*int8)(unsafe.Pointer(vptr + (uintptr(i))))
+	}
+	s.size -= size
+	*ptr = unsafe.Pointer(&v[0])
+	return nil
+}
+
+func (s *GLMstack) TsPopptr(ptr unsafe.Pointer, size uint64) error {
+	s.mutex.RLock()
+	if s.size+size >= s.scap {
+		s.mutex.RUnlock()
+		s.scap = s.addcap(s.size + size)
+		s.mutex.RLock()
+	}
+	sizeold := atomic.AddUint64(&s.size, size)
+	sizeold = atomic.AddUint64(&sizeold, ^uint64(s.size-1))
+	for i := uint64(0); i < size; i++ {
+		sizei := sizeold + i
+		value := *(*int8)(unsafe.Pointer(uintptr(ptr) + uintptr(i)))
+		s.slice[sizei] = value
+	}
+	s.mutex.RUnlock()
+	return nil
+}
