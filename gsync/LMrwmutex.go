@@ -63,8 +63,5 @@ func (m *LMrwmutex) RUnlock() {
 	if ok == true {
 		panic(Noreadlock)
 	}
-	for {
-		atomic.AddInt64(&m.nm, -1)
-		break
-	}
+	atomic.AddInt64(&m.nm, -1)
 }
