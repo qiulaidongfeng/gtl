@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"sync"
 	"sync/atomic"
+	"time"
 	"unsafe"
 )
 
@@ -34,6 +35,8 @@ type GenericLowMemoryStack struct {
 	slice []int8
 	size  uint64
 	scap  uint64
+	rw    int64
+	n     int64
 	mutex sync.RWMutex
 }
 
@@ -44,6 +47,7 @@ func NewGLMstack() GLMstack {
 		slice: make([]int8, 2, 2),
 		size:  2,
 		scap:  2,
+		rw:    0,
 	}
 	return s
 }
@@ -82,6 +86,42 @@ func (s *GLMstack) Tsaddcap(size uint64) (ncap uint64) {
 	s.slice = nslice
 	s.mutex.Unlock()
 	return
+}
+
+func (s *GLMstack) rwrecord(rw int, waittime time.Duration) {
+	if rw == 1 {
+		for {
+			bol := atomic.CompareAndSwapInt64(&s.rw, -1, -1)
+			if bol == true {
+				time.Sleep(waittime)
+				continue
+			} else {
+				old := atomic.SwapInt64(&s.rw, 1)
+				if old == -1 {
+					atomic.StoreInt64(&s.rw, -1)
+					continue
+				}
+				atomic.AddInt64(&s.n, 1)
+			}
+		}
+	} else if rw == -1 {
+		for {
+			bol := atomic.CompareAndSwapInt64(&s.rw, 1, 1)
+			if bol == true {
+				time.Sleep(waittime)
+				continue
+			} else {
+				old := atomic.SwapInt64(&s.rw, -1)
+				if old == -1 {
+					atomic.StoreInt64(&s.rw, 1)
+					continue
+				}
+				atomic.AddInt64(&s.n, 1)
+			}
+		}
+	} else {
+		panic("err:无效操作")
+	}
 }
 
 func (s *GLMstack) Push(x interface{}) error {
@@ -356,13 +396,10 @@ func (s *GLMstack) Popptr(ptr *unsafe.Pointer, size uint64) error {
 func (s *GLMstack) TsPopptr(ptr *unsafe.Pointer, size uint64) error {
 	s.mutex.RLock()
 	v := make([]int8, size, size)
-	sisei := atomic.AddUint64(&s.size, ^(size-1))
-	sizeold := atomic.AddUint64(&s.size, size)
-	sizeold = atomic.AddUint64(&sizeold, ^uint64(s.size-1))
+	sizei := atomic.AddUint64(&s.size, ^(size - 1))
+	vptr := uintptr(unsafe.Pointer(&s.slice[0])) + uintptr(sizei)
 	for i := uint64(0); i < size; i++ {
-		sizei := sizeold + i
-		value := *(*int8)(unsafe.Pointer(uintptr(ptr) + uintptr(i)))
-		s.slice[sizei] = value
+		v[i] = *(*int8)(unsafe.Pointer(vptr + (uintptr(i))))
 	}
 	*ptr = unsafe.Pointer(&v[0])
 	s.mutex.RUnlock()
