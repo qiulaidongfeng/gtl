@@ -384,7 +384,7 @@ func (s *GLMstack) Tsclear() error {
 func (s *GLMstack) Popptr(ptr *unsafe.Pointer, size uint64) error {
 	v := make([]int8, size, size)
 	sizei := s.size - size
-	vptr := uintptr(unsafe.Pointer(&s.slice[0])) + uintptr(sizei)
+	vptr := uintptr(unsafe.Pointer(&s.slice[0])) + uintptr(sizei) - uintptr(1)
 	for i := uint64(0); i < size; i++ {
 		v[i] = *(*int8)(unsafe.Pointer(vptr + (uintptr(i))))
 	}
