@@ -10,6 +10,10 @@ import (
 )
 
 const (
+	gotoc uint64 = 50000
+)
+
+const (
 	Int8size       uint64 = uint64((unsafe.Sizeof(int8(1))))
 	Int16size      uint64 = uint64((unsafe.Sizeof(int16(1))))
 	Int32size      uint64 = uint64((unsafe.Sizeof(int32(1))))
@@ -385,9 +389,16 @@ func (s *GLMstack) Popptr(ptr *unsafe.Pointer, size uint64) error {
 	v := make([]int8, size, size)
 	sizei := s.size - size
 	vptr := uintptr(unsafe.Pointer(&s.slice[0])) + uintptr(sizei) - uintptr(1)
-	for i := uint64(0); i < size; i++ {
-		v[i] = *(*int8)(unsafe.Pointer(vptr + (uintptr(i))))
+	if size < gotoc {
+		for i := uint64(0); i < s.size; i++ {
+			nslice[i] = s.slice[i]
+		}
+	} else if size >= gotoc {
+		dest := unsafe.Pointer(&(nslice[0]))
+		src := unsafe.Pointer(&(s.slice[0]))
+		cextend.Memcpy(dest, src, uint(s.size))
 	}
+	s.slice = nslice
 	s.size -= size
 	*ptr = unsafe.Pointer(&v[0])
 	return nil
