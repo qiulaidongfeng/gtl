@@ -62,10 +62,10 @@ func (s *GLMstack) addcap(size uint64) (ncap uint64) {
 		}
 	}
 	nslice := make([]int8, ncap, ncap)
-	nptr := uintptr(unsafe.Pointer(&nslice[0]))
-	uptr := uintptr(unsafe.Pointer(&s.slice[0]))
+	// nptr := uintptr(unsafe.Pointer(&nslice[0]))
+	// uptr := uintptr(unsafe.Pointer(&s.slice[0]))
 	for i := uint64(0); i < s.size; i++ {
-		*(*int8)(unsafe.Pointer(uptr + uintptr(i))) = *(*int8)(unsafe.Pointer(nptr + (uintptr(i))))
+		nslice[i] = s.slice[i]
 	}
 	s.slice = nslice
 	return
