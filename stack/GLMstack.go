@@ -32,12 +32,13 @@ const (
 )
 
 type GenericLowMemoryStack struct {
-	slice []int8
-	size  uint64
-	scap  uint64
-	rw    int64
-	n     int64
-	mutex sync.RWMutex
+	slice  []int8
+	size   uint64
+	scap   uint64
+	readn  uint64
+	writen uint64
+	rw     int64
+	mutex  sync.RWMutex
 }
 
 type GLMstack = GenericLowMemoryStack
@@ -90,39 +91,43 @@ func (s *GLMstack) Tsaddcap(size uint64) (ncap uint64) {
 	return
 }
 
-func (s *GLMstack) rwrecord(rw int, waittime time.Duration) {
-	if rw == 1 {
-		for {
-			bol := atomic.CompareAndSwapInt64(&s.rw, -1, -1)
+//设置为写时操作
+func (s *GLMstack) writerecord(waittime time.Duration) {
+	for {
+		atomic.AddUint64(&s.writen, 1)
+		rw := atomic.LoadUint64(&s.rw)
+		if rw == -1 {
+			return
+		} else if rw == 0 {
+			bol := atomic.CompareAndSwapUint64(&s.rw, 0, -1)
 			if bol == true {
-				time.Sleep(waittime)
-				continue
+				return
 			} else {
-				old := atomic.SwapInt64(&s.rw, 1)
-				if old == -1 {
-					atomic.StoreInt64(&s.rw, -1)
-					continue
-				}
-				atomic.AddInt64(&s.n, 1)
+				time.Sleep(waittime)
 			}
+		} else {
+			time.Sleep(waittime)
 		}
-	} else if rw == -1 {
-		for {
-			bol := atomic.CompareAndSwapInt64(&s.rw, 1, 1)
+	}
+}
+
+//设置为读时操作
+func (s *GLMstack) readrecord(waittime time.Duration) {
+	for {
+		atomic.AddUint64(&s.readn, 1)
+		rw := atomic.LoadUint64(&s.rw)
+		if rw == 1 {
+			return
+		} else if rw == 0 {
+			bol := atomic.CompareAndSwapUint64(&s.rw, 0, 1)
 			if bol == true {
-				time.Sleep(waittime)
-				continue
+				return
 			} else {
-				old := atomic.SwapInt64(&s.rw, -1)
-				if old == -1 {
-					atomic.StoreInt64(&s.rw, 1)
-					continue
-				}
-				atomic.AddInt64(&s.n, 1)
+				time.Sleep(waittime)
 			}
+		} else {
+			time.Sleep(waittime)
 		}
-	} else {
-		panic("err:无效操作")
 	}
 }
 
