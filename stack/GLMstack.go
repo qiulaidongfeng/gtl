@@ -10,6 +10,11 @@ import (
 )
 
 const (
+	Readtime  = time.Duration(2)
+	Writetime = time.Duration(3)
+)
+
+const (
 	Int8size       uint64 = uint64((unsafe.Sizeof(int8(1))))
 	Int16size      uint64 = uint64((unsafe.Sizeof(int16(1))))
 	Int32size      uint64 = uint64((unsafe.Sizeof(int32(1))))
@@ -32,13 +37,15 @@ const (
 )
 
 type GenericLowMemoryStack struct {
-	slice  []int8
-	size   uint64
-	scap   uint64
-	readn  uint64
-	writen uint64
-	rw     int64
-	mutex  sync.RWMutex
+	slice     []int8
+	size      uint64
+	scap      uint64
+	readn     uint64
+	writen    uint64
+	rw        int64
+	readtime  time.Duration
+	writetime time.Duration
+	mutex     sync.RWMutex
 }
 
 type GLMstack = GenericLowMemoryStack
@@ -95,11 +102,11 @@ func (s *GLMstack) Tsaddcap(size uint64) (ncap uint64) {
 func (s *GLMstack) writerecord(waittime time.Duration) {
 	for {
 		atomic.AddUint64(&s.writen, 1)
-		rw := atomic.LoadUint64(&s.rw)
+		rw := atomic.LoadInt64(&s.rw)
 		if rw == -1 {
 			return
 		} else if rw == 0 {
-			bol := atomic.CompareAndSwapUint64(&s.rw, 0, -1)
+			bol := atomic.CompareAndSwapInt64(&s.rw, 0, -1)
 			if bol == true {
 				return
 			} else {
@@ -115,11 +122,11 @@ func (s *GLMstack) writerecord(waittime time.Duration) {
 func (s *GLMstack) readrecord(waittime time.Duration) {
 	for {
 		atomic.AddUint64(&s.readn, 1)
-		rw := atomic.LoadUint64(&s.rw)
+		rw := atomic.LoadInt64(&s.rw)
 		if rw == 1 {
 			return
 		} else if rw == 0 {
-			bol := atomic.CompareAndSwapUint64(&s.rw, 0, 1)
+			bol := atomic.CompareAndSwapInt64(&s.rw, 0, 1)
 			if bol == true {
 				return
 			} else {
