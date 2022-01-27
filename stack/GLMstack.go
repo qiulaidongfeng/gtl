@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	Readtime  = time.Duration(2)
-	Writetime = time.Duration(3)
+	Poptime  = time.Duration(20) * 2
+	Pushtime = time.Duration(30) * 2
 )
 
 const (
@@ -37,25 +37,29 @@ const (
 )
 
 type GenericLowMemoryStack struct {
-	slice     []int8
-	size      uint64
-	scap      uint64
-	readn     uint64
-	writen    uint64
-	rw        int64
-	readtime  time.Duration
-	writetime time.Duration
-	mutex     sync.RWMutex
+	slice    []int8
+	size     uint64
+	scap     uint64
+	pushn    uint64
+	popn     uint64
+	pp       int64
+	pushtime time.Duration
+	poptime  time.Duration
+	mutex    sync.RWMutex
 }
 
 type GLMstack = GenericLowMemoryStack
 
 func NewGLMstack() GLMstack {
 	s := GLMstack{
-		slice: make([]int8, 2, 2),
-		size:  2,
-		scap:  2,
-		rw:    0,
+		slice:    make([]int8, 2, 2),
+		size:     2,
+		scap:     2,
+		pushn:    0,
+		popn:     0,
+		pp:       0,
+		pushtime: Pushtime,
+		poptime:  Poptime,
 	}
 	return s
 }
@@ -98,15 +102,15 @@ func (s *GLMstack) Tsaddcap(size uint64) (ncap uint64) {
 	return
 }
 
-//设置为写时操作
-func (s *GLMstack) writerecord(waittime time.Duration) {
+//设置为入栈时操作
+func (s *GLMstack) pushrecord(waittime time.Duration) {
 	for {
-		atomic.AddUint64(&s.writen, 1)
-		rw := atomic.LoadInt64(&s.rw)
+		atomic.AddUint64(&s.pushn, 1)
+		rw := atomic.LoadInt64(&s.pp)
 		if rw == -1 {
 			return
 		} else if rw == 0 {
-			bol := atomic.CompareAndSwapInt64(&s.rw, 0, -1)
+			bol := atomic.CompareAndSwapInt64(&s.pp, 0, -1)
 			if bol == true {
 				return
 			} else {
@@ -118,15 +122,15 @@ func (s *GLMstack) writerecord(waittime time.Duration) {
 	}
 }
 
-//设置为读时操作
-func (s *GLMstack) readrecord(waittime time.Duration) {
+//设置为出栈时操作
+func (s *GLMstack) poprecord(waittime time.Duration) {
 	for {
-		atomic.AddUint64(&s.readn, 1)
-		rw := atomic.LoadInt64(&s.rw)
+		atomic.AddUint64(&s.popn, 1)
+		rw := atomic.LoadInt64(&s.pp)
 		if rw == 1 {
 			return
 		} else if rw == 0 {
-			bol := atomic.CompareAndSwapInt64(&s.rw, 0, 1)
+			bol := atomic.CompareAndSwapInt64(&s.pp, 0, 1)
 			if bol == true {
 				return
 			} else {
@@ -400,8 +404,8 @@ func (s *GLMstack) Popptr(ptr *unsafe.Pointer, size uint64) error {
 	s.size -= size
 	vptr := uintptr(unsafe.Pointer(&s.slice[0])) + uintptr(sizei)
 	uptr := uintptr(*ptr)
-	for i := uint64(0); i < s.size; i++ {
-		*(*int8)(unsafe.Pointer(uptr + uintptr(i))) = *(*int8)(unsafe.Pointer(vptr + (uintptr(i))))
+	for i := uint64(0); i < size; i++ {
+		*(*int8)(unsafe.Pointer(vptr + (uintptr(i)))) = *(*int8)(unsafe.Pointer(uptr + uintptr(i)))
 	}
 	return nil
 }
