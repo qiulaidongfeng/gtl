@@ -32,6 +32,7 @@ func (s *GLMstack) TsPushint(x int) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*int)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -55,6 +56,7 @@ func (s *GLMstack) TsPushint8(x int8) error {
 		s.mutex.RLock()
 	}
 	s.slice[nsize] = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -86,6 +88,7 @@ func (s *GLMstack) TsPushint16(x int16) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*int16)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -117,6 +120,7 @@ func (s *GLMstack) TsPushint32(x int32) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*int32)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -148,6 +152,7 @@ func (s *GLMstack) TsPushint64(x int64) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*int64)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -179,6 +184,7 @@ func (s *GLMstack) TsPushuint(x uint) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*uint)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -210,6 +216,7 @@ func (s *GLMstack) TsPushuint8(x uint8) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*uint8)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -241,6 +248,7 @@ func (s *GLMstack) TsPushuint16(x uint16) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*uint16)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -272,6 +280,7 @@ func (s *GLMstack) TsPushuint32(x uint32) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*uint32)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -303,6 +312,7 @@ func (s *GLMstack) TsPushuint64(x uint64) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*uint64)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -334,6 +344,7 @@ func (s *GLMstack) TsPushByte(x byte) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*byte)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -365,6 +376,7 @@ func (s *GLMstack) TsPushRune(x rune) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*rune)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -396,6 +408,7 @@ func (s *GLMstack) TsPushBool(x bool) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*bool)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -427,6 +440,7 @@ func (s *GLMstack) TsPushFloat32(x float32) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*float32)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -458,6 +472,7 @@ func (s *GLMstack) TsPushFloat64(x float64) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*float64)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -489,6 +504,7 @@ func (s *GLMstack) TsPushUintptr(x uintptr) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*uintptr)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -520,6 +536,7 @@ func (s *GLMstack) TsPushComplex128(x complex128) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*complex128)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -551,6 +568,7 @@ func (s *GLMstack) TsPushComplex64(x complex64) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*complex64)(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -582,6 +600,7 @@ func (s *GLMstack) TsPushInterface(x interface{}) error {
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
 	sp2 := (*interface{})(sp)
 	*sp2 = x
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
