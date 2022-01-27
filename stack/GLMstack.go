@@ -10,8 +10,14 @@ import (
 )
 
 const (
-	Poptime  = int64(20)
-	Pushtime = int64(30)
+	pushpp int64 = -1
+	poppp  int64 = 1
+)
+
+const (
+	Poptime  = int64(70)
+	Pushtime = int64(140)
+	Waittime = int64(100)
 )
 
 const (
@@ -45,6 +51,7 @@ type GenericLowMemoryStack struct {
 	pp       int64
 	pushtime int64
 	poptime  int64
+	waittime int64
 	mutex    sync.RWMutex
 }
 
@@ -60,7 +67,9 @@ func NewGLMstack() GLMstack {
 		pp:       0,
 		pushtime: Pushtime,
 		poptime:  Poptime,
+		waittime: Waittime,
 	}
+	go s.pprecode()
 	return s
 }
 
@@ -76,7 +85,7 @@ func (s *GLMstack) addcap(size uint64) (ncap uint64) {
 	nslice := make([]int8, ncap, ncap)
 	// nptr := uintptr(unsafe.Pointer(&nslice[0]))
 	// uptr := uintptr(unsafe.Pointer(&s.slice[0]))
-	for i := uint64(0); i < s.size; i++ {
+	for i := uint64(0); i < s.scap; i++ {
 		nslice[i] = s.slice[i]
 	}
 	s.slice = nslice
@@ -94,7 +103,7 @@ func (s *GLMstack) Tsaddcap(size uint64) (ncap uint64) {
 		}
 	}
 	nslice := make([]int8, ncap, ncap)
-	for i := uint64(0); i < s.size; i++ {
+	for i := uint64(0); i < s.scap; i++ {
 		nslice[i] = s.slice[i]
 	}
 	s.slice = nslice
@@ -102,15 +111,55 @@ func (s *GLMstack) Tsaddcap(size uint64) (ncap uint64) {
 	return
 }
 
+//记录现在是入栈还是出栈
+func (s *GLMstack) pprecode() {
+	for {
+		bol := atomic.CompareAndSwapInt64(&s.pp, poppp, poppp) //现在是出栈
+		if bol == true {
+			popn := atomic.LoadInt64(&s.popn)
+			if popn == 0 { //现在没有实际出栈
+				atomic.SwapInt64(&s.pp, 0)
+				popnold := atomic.LoadInt64(&s.popn)
+				if popnold != 0 { //出现实际出栈
+					atomic.SwapInt64(&s.pp, poppp) //记录为出栈
+					time.Sleep(time.Duration(s.pushtime * s.pushn))
+					continue
+				} else {
+					continue
+				}
+			}
+		} else {
+			bol := atomic.CompareAndSwapInt64(&s.pp, pushpp, pushpp) //现在是入栈
+			if bol == true {
+				pushn := atomic.LoadInt64(&s.pushn)
+				if pushn == 0 { //现在没有实际入栈
+					atomic.SwapInt64(&s.pp, 0)
+					pushnold := atomic.LoadInt64(&s.pushn)
+					if pushnold != 0 { //出现实际入栈
+						atomic.StoreInt64(&s.pp, pushpp) //记录为入栈
+						time.Sleep(time.Duration(s.poptime * s.popn))
+						continue
+					}
+				} else {
+					continue
+				}
+			} else { //现在没有栈操作
+				time.Sleep(time.Duration(s.waittime))
+				continue
+			}
+		}
+	}
+}
+
 //记录为入栈时操作
 func (s *GLMstack) pushrecord() {
+	atomic.AddInt64(&s.pushn, 1)
 	for {
-		atomic.AddInt64(&s.pushn, 1)
 		rw := atomic.LoadInt64(&s.pp)
 		if rw == -1 { //正在入栈操作
 			return
 		} else if rw == 0 {
-			bol := atomic.CompareAndSwapInt64(&s.pp, 0, -1)
+			bol := atomic.CompareAndSwapInt64(&s.pp, 0, pushpp)
 			if bol == true { //无操作
 				return
 			} else { //正在出栈操作
@@ -122,15 +171,23 @@ func (s *GLMstack) pushrecord() {
 	}
 }
 
+func (s *GLMstack) pushok() {
+	atomic.AddInt64(&s.pushn, -1)
+}
+
+func (s *GLMstack) popok() {
+	atomic.AddInt64(&s.popn, -1)
+}
+
 //记录为出栈时操作
 func (s *GLMstack) poprecord() {
+	atomic.AddInt64(&s.popn, 1)
 	for {
-		atomic.AddInt64(&s.popn, 1)
 		rw := atomic.LoadInt64(&s.pp)
 		if rw == 1 { //正在出栈操作
 			return
 		} else if rw == 0 {
-			bol := atomic.CompareAndSwapInt64(&s.pp, 0, 1)
+			bol := atomic.CompareAndSwapInt64(&s.pp, 0, poppp)
 			if bol == true { //无操作
 				return
 			} else {
@@ -374,6 +431,7 @@ func (s *GLMstack) TsPushptr(ptr unsafe.Pointer, size uint64) error {
 		value := *(*int8)(unsafe.Pointer(uptr + uintptr(i)))
 		s.slice[sizei] = value
 	}
+	s.pushok() //结束记录
 	s.mutex.RUnlock()
 	return nil
 }
@@ -422,6 +480,19 @@ func (s *GLMstack) TsPopptr(ptr *unsafe.Pointer, size uint64) error {
 	for i := uint64(0); i < size; i++ { //实际出栈
 		*(*int8)(unsafe.Pointer(vptr + (uintptr(i)))) = *(*int8)(unsafe.Pointer(uptr + uintptr(i)))
 	}
+	s.popok() //结束记录
 	s.mutex.RUnlock()
 	return nil
+}
+
+func (s *GLMstack) TsLoadpp() int64 {
+	return atomic.LoadInt64(&s.pp)
+}
+
+func (s *GLMstack) TsLoadpopn() int64 {
+	return atomic.LoadInt64(&s.popn)
+}
+
+func (s *GLMstack) TsLoadpushn() int64 {
+	return atomic.LoadInt64(&s.pushn)
 }
