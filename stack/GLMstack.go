@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	Poptime  = time.Duration(20) * 2
-	Pushtime = time.Duration(30) * 2
+	Poptime  = int64(20)
+	Pushtime = int64(30)
 )
 
 const (
@@ -40,11 +40,11 @@ type GenericLowMemoryStack struct {
 	slice    []int8
 	size     uint64
 	scap     uint64
-	pushn    uint64
-	popn     uint64
+	pushn    int64
+	popn     int64
 	pp       int64
-	pushtime time.Duration
-	poptime  time.Duration
+	pushtime int64
+	poptime  int64
 	mutex    sync.RWMutex
 }
 
@@ -102,42 +102,42 @@ func (s *GLMstack) Tsaddcap(size uint64) (ncap uint64) {
 	return
 }
 
-//设置为入栈时操作
-func (s *GLMstack) pushrecord(waittime time.Duration) {
+//记录为入栈时操作
+func (s *GLMstack) pushrecord() {
 	for {
-		atomic.AddUint64(&s.pushn, 1)
+		atomic.AddInt64(&s.pushn, 1)
 		rw := atomic.LoadInt64(&s.pp)
-		if rw == -1 {
+		if rw == -1 { //正在入栈操作
 			return
 		} else if rw == 0 {
 			bol := atomic.CompareAndSwapInt64(&s.pp, 0, -1)
-			if bol == true {
+			if bol == true { //无操作
 				return
-			} else {
-				time.Sleep(waittime)
+			} else { //正在出栈操作
+				time.Sleep(time.Duration(s.poptime * s.popn))
 			}
-		} else {
-			time.Sleep(waittime)
+		} else { //正在出栈操作
+			time.Sleep(time.Duration(s.poptime * s.popn))
 		}
 	}
 }
 
-//设置为出栈时操作
-func (s *GLMstack) poprecord(waittime time.Duration) {
+//记录为出栈时操作
+func (s *GLMstack) poprecord() {
 	for {
-		atomic.AddUint64(&s.popn, 1)
+		atomic.AddInt64(&s.popn, 1)
 		rw := atomic.LoadInt64(&s.pp)
-		if rw == 1 {
+		if rw == 1 { //正在出栈操作
 			return
 		} else if rw == 0 {
 			bol := atomic.CompareAndSwapInt64(&s.pp, 0, 1)
-			if bol == true {
+			if bol == true { //无操作
 				return
 			} else {
-				time.Sleep(waittime)
+				time.Sleep(time.Duration(s.pushtime * s.pushn))
 			}
 		} else {
-			time.Sleep(waittime)
+			time.Sleep(time.Duration(s.pushtime * s.pushn))
 		}
 	}
 }
@@ -348,9 +348,10 @@ func (s *GLMstack) Pushptr(ptr unsafe.Pointer, size uint64) error {
 	if s.size+size >= s.scap {
 		s.scap = s.addcap(s.size + size)
 	}
+	uptr := uintptr(ptr)
 	for i := uint64(0); i < size; i++ {
 		size := s.size + i
-		value := *(*int8)(unsafe.Pointer(uintptr(ptr) + uintptr(i)))
+		value := *(*int8)(unsafe.Pointer(uptr + uintptr(i)))
 		s.slice[size] = value
 	}
 	s.size += size
@@ -359,6 +360,7 @@ func (s *GLMstack) Pushptr(ptr unsafe.Pointer, size uint64) error {
 
 func (s *GLMstack) TsPushptr(ptr unsafe.Pointer, size uint64) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	if s.size+size >= s.scap {
 		s.mutex.RUnlock()
 		s.scap = s.addcap(s.size + size)
@@ -366,9 +368,10 @@ func (s *GLMstack) TsPushptr(ptr unsafe.Pointer, size uint64) error {
 	}
 	sizeold := atomic.AddUint64(&s.size, size)
 	sizeold = atomic.AddUint64(&sizeold, ^uint64(s.size-1))
-	for i := uint64(0); i < size; i++ {
+	uptr := uintptr(ptr)
+	for i := uint64(0); i < size; i++ { //实际入栈
 		sizei := sizeold + i
-		value := *(*int8)(unsafe.Pointer(uintptr(ptr) + uintptr(i)))
+		value := *(*int8)(unsafe.Pointer(uptr + uintptr(i)))
 		s.slice[sizei] = value
 	}
 	s.mutex.RUnlock()
@@ -412,13 +415,13 @@ func (s *GLMstack) Popptr(ptr *unsafe.Pointer, size uint64) error {
 
 func (s *GLMstack) TsPopptr(ptr *unsafe.Pointer, size uint64) error {
 	s.mutex.RLock()
-	v := make([]int8, size, size)
+	s.poprecord() //出栈记录
 	sizei := atomic.AddUint64(&s.size, ^(size - 1))
 	vptr := uintptr(unsafe.Pointer(&s.slice[0])) + uintptr(sizei)
-	for i := uint64(0); i < size; i++ {
-		v[i] = *(*int8)(unsafe.Pointer(vptr + (uintptr(i))))
+	uptr := uintptr(*ptr)
+	for i := uint64(0); i < size; i++ { //实际出栈
+		*(*int8)(unsafe.Pointer(vptr + (uintptr(i)))) = *(*int8)(unsafe.Pointer(uptr + uintptr(i)))
 	}
-	*ptr = unsafe.Pointer(&v[0])
 	s.mutex.RUnlock()
 	return nil
 }
