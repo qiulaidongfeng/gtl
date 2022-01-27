@@ -111,7 +111,7 @@ func (s *GLMstack) Tsaddcap(size uint64) (ncap uint64) {
 	return
 }
 
-//记录现在是入栈还是出栈
+/*//记录现在是入栈还是出栈
 func (s *GLMstack) pprecode() {
 	for {
 		bol := atomic.CompareAndSwapInt64(&s.pp, poppp, poppp) //现在是出栈
@@ -146,6 +146,31 @@ func (s *GLMstack) pprecode() {
 			} else { //现在没有栈操作
 				time.Sleep(time.Duration(s.waittime))
 				continue
+			}
+		}
+	}
+}
+*/
+
+//记录现在是入栈还是出栈
+func (s *GLMstack) pprecode() {
+	for {
+		pp := atomic.LoadInt64(&s.pp)
+		if pp == 0 {
+			time.Sleep(time.Duration(s.waittime))
+		} else if pp == poppp {
+			popn := atomic.LoadInt64(&s.popn)
+			if popn == 0 {
+				atomic.SwapInt64(&s.pp, 0)
+			} else {
+				time.Sleep(time.Duration(s.poptime * popn))
+			}
+		} else {
+			pushn := atomic.LoadInt64(&s.pushn)
+			if pushn == 0 {
+				atomic.SwapInt64(&s.pp, 0)
+			} else {
+				time.Sleep(time.Duration(s.pushtime * pushn))
 			}
 		}
 	}
