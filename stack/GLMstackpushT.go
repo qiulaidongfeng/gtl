@@ -20,6 +20,7 @@ func (s *GLMstack) Pushint(x int) error {
 
 func (s *GLMstack) TsPushint(x int) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Intsize)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -46,6 +47,7 @@ func (s *GLMstack) Pushint8(x int8) error {
 
 func (s *GLMstack) TsPushint8(x int8) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Int8size)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -72,6 +74,7 @@ func (s *GLMstack) Pushint16(x int16) error {
 
 func (s *GLMstack) TsPushint16(x int16) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Int16size)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -102,6 +105,7 @@ func (s *GLMstack) Pushint32(x int32) error {
 
 func (s *GLMstack) TsPushint32(x int32) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Int32size)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -132,6 +136,7 @@ func (s *GLMstack) Pushint64(x int64) error {
 
 func (s *GLMstack) TsPushint64(x int64) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Int64size)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -162,6 +167,7 @@ func (s *GLMstack) Pushuint(x uint) error {
 
 func (s *GLMstack) TsPushuint(x uint) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Uintsize)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -192,6 +198,7 @@ func (s *GLMstack) Pushuint8(x uint8) error {
 
 func (s *GLMstack) TsPushuint8(x uint8) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Uint8size)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -222,6 +229,7 @@ func (s *GLMstack) Pushuint16(x uint16) error {
 
 func (s *GLMstack) TsPushuint16(x uint16) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Uint16size)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -252,6 +260,7 @@ func (s *GLMstack) Pushuint32(x uint32) error {
 
 func (s *GLMstack) TsPushuint32(x uint32) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Uint32size)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -282,6 +291,7 @@ func (s *GLMstack) Pushuint64(x uint64) error {
 
 func (s *GLMstack) TsPushuint64(x uint64) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Uint64size)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -312,6 +322,7 @@ func (s *GLMstack) PushByte(x byte) error {
 
 func (s *GLMstack) TsPushByte(x byte) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Bytesize)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -342,6 +353,7 @@ func (s *GLMstack) PushRune(x rune) error {
 
 func (s *GLMstack) TsPushRune(x rune) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Runesize)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -372,6 +384,7 @@ func (s *GLMstack) PushBool(x bool) error {
 
 func (s *GLMstack) TsPushBool(x bool) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Boolsize)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -402,6 +415,7 @@ func (s *GLMstack) PushFloat32(x float32) error {
 
 func (s *GLMstack) TsPushFloat32(x float32) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Float32size)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -432,6 +446,7 @@ func (s *GLMstack) PushFloat64(x float64) error {
 
 func (s *GLMstack) TsPushFloat64(x float64) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Float64size)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -462,6 +477,7 @@ func (s *GLMstack) PushUintptr(x uintptr) error {
 
 func (s *GLMstack) TsPushUintptr(x uintptr) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Uintptrsize)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -492,6 +508,7 @@ func (s *GLMstack) PushComplex128(x complex128) error {
 
 func (s *GLMstack) TsPushComplex128(x complex128) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Complex128size)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -522,6 +539,7 @@ func (s *GLMstack) PushComplex64(x complex64) error {
 
 func (s *GLMstack) TsPushComplex64(x complex64) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Complex64size)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
@@ -552,6 +570,7 @@ func (s *GLMstack) PushInterface(x interface{}) error {
 
 func (s *GLMstack) TsPushInterface(x interface{}) error {
 	s.mutex.RLock()
+	s.pushrecord() //入栈记录
 	nsize := atomic.AddUint64(&s.size, Interfacesize)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
