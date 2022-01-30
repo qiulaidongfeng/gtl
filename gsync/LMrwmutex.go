@@ -17,7 +17,10 @@ const (
 	writelock = -1
 )
 
+type nocopy struct{}
+
 type LMrwmutex struct {
+	_  nocopy
 	nm int64
 }
 
