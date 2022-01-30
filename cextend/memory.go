@@ -8,7 +8,6 @@ package cextend
 import "C"
 
 import (
-	"fmt"
 	"runtime/cgo"
 	"unsafe"
 )
