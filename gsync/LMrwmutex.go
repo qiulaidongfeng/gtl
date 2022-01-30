@@ -12,13 +12,18 @@ var (
 	Nowritelock error = errors.New("No write lock")
 )
 
+const (
+	nolock    = 0
+	writelock = -1
+)
+
 type LMrwmutex struct {
 	nm int64
 }
 
 func (m *LMrwmutex) Lock() {
 	for {
-		ok := atomic.CompareAndSwapInt64(&m.nm, 0, -1)
+		ok := atomic.CompareAndSwapInt64(&m.nm, nolock, writelock)
 		if ok == true {
 			break
 		}
@@ -32,7 +37,7 @@ func (m *LMrwmutex) Unlock() {
 		panic(Nowritelock)
 	}
 	for {
-		ok := atomic.CompareAndSwapInt64(&m.nm, -1, 0)
+		ok := atomic.CompareAndSwapInt64(&m.nm, writelock, nolock)
 		if ok == true {
 			break
 		}
@@ -42,25 +47,23 @@ func (m *LMrwmutex) Unlock() {
 
 func (m *LMrwmutex) RLock() {
 	for {
-		ok := atomic.CompareAndSwapInt64(&m.nm, -1, -1)
+		ok := atomic.CompareAndSwapInt64(&m.nm, writelock, writelock)
 		if ok == true {
 			runtime.Gosched()
 			continue
 		}
 		nm := atomic.AddInt64(&m.nm, 1)
-		if nm == 0 {
+		if nm > 0 {
 			break
 		}
 	}
 }
 
 func (m *LMrwmutex) RUnlock() {
-	ok := atomic.CompareAndSwapInt64(&m.nm, -1, -1)
-	if ok == true {
+	nm := atomic.LoadInt64(&m.nm)
+	if nm == -1 {
 		panic(Noreadlock)
-	}
-	ok = atomic.CompareAndSwapInt64(&m.nm, 0, 0)
-	if ok == true {
+	} else if nm == 0 {
 		panic(Noreadlock)
 	}
 	atomic.AddInt64(&m.nm, -1)
