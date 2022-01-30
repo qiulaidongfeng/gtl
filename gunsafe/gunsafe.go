@@ -9,6 +9,6 @@ func Stob(s string) []byte {
 	return *(*[]byte)(unsafe.Pointer(&h))
 }
 
-func Btot(b []byte) string {
+func Btos(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
