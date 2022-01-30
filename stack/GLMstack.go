@@ -57,8 +57,8 @@ type GenericLowMemoryStack struct {
 
 type GLMstack = GenericLowMemoryStack
 
-func NewGLMstack() GLMstack {
-	s := GLMstack{
+func NewGLMstack() *GLMstack {
+	s := &GLMstack{
 		slice:    make([]int8, 2, 2),
 		size:     2,
 		scap:     2,
