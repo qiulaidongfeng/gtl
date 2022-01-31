@@ -3,7 +3,6 @@ package stack
 
 import (
 	"reflect"
-	"sync/atomic"
 	"unsafe"
 )
 
@@ -210,9 +209,7 @@ func (s *GLMstack) TsPush(x interface{}) error {
 }
 
 func (s *GLMstack) Pushptr(ptr unsafe.Pointer, size uint64) error {
-	if s.size+size >= s.scap {
-		s.scap = s.addcap(s.size + size)
-	}
+	s.pushsafetycheck(size) //入栈安全检查
 	uptr := uintptr(ptr)
 	for i := uint64(0); i < size; i++ {
 		size := s.size + i
@@ -225,14 +222,8 @@ func (s *GLMstack) Pushptr(ptr unsafe.Pointer, size uint64) error {
 
 func (s *GLMstack) TsPushptr(ptr unsafe.Pointer, size uint64) error {
 	s.mutex.RLock()
-	s.pushrecord() //入栈记录
-	if s.size+size >= s.scap {
-		s.mutex.RUnlock()
-		s.scap = s.addcap(s.size + size)
-		s.mutex.RLock()
-	}
-	sizeold := atomic.AddUint64(&s.size, size)
-	sizeold = atomic.AddUint64(&sizeold, ^uint64(s.size-1))
+	s.pushrecord()                       //入栈记录
+	sizeold := s.tspushsafetycheck(size) //入栈安全检查
 	uptr := uintptr(ptr)
 	for i := uint64(0); i < size; i++ { //实际入栈
 		sizei := sizeold + i
