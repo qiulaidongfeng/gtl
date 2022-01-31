@@ -89,7 +89,24 @@ func (s *GLMstack) addcap(size uint64) (ncap uint64) {
 	return
 }
 
-func (s *GLMstack) Tsaddcap(size uint64) (ncap uint64) {
+func (s *GLMstack) pushsafetycheck(size uint64) {
+	if s.size+size >= s.scap {
+		s.scap = s.addcap(s.size + size)
+	}
+}
+
+func (s *GLMstack) tspushsafetycheck(size uint64) (sizeold uint64) {
+	nsize := atomic.AddUint64(&s.size, size)
+	if nsize >= s.scap {
+		s.mutex.RUnlock()
+		s.scap = s.addcap(nsize)
+		s.mutex.RLock()
+	}
+	sizeold = nsize - size
+	return
+}
+
+func (s *GLMstack) tsaddcap(size uint64) (ncap uint64) {
 	s.mutex.Lock()
 	ncap = uint64(cap(s.slice))
 	for ncap <= size {
