@@ -39,13 +39,7 @@ func (m *LMrwmutex) Unlock() {
 	if nm >= 0 {
 		panic(Nowritelock)
 	}
-	for {
-		ok := atomic.CompareAndSwapInt64(&m.nm, writelock, nolock)
-		if ok == true {
-			break
-		}
-		runtime.Gosched()
-	}
+	atomic.StoreInt64(&m.nm, nolock)
 }
 
 func (m *LMrwmutex) RLock() {
@@ -55,10 +49,8 @@ func (m *LMrwmutex) RLock() {
 			runtime.Gosched()
 			continue
 		}
-		nm := atomic.AddInt64(&m.nm, 1)
-		if nm > 0 {
-			break
-		}
+		atomic.AddInt64(&m.nm, 1)
+		break
 	}
 }
 
