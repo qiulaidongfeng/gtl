@@ -27,10 +27,11 @@ var (
 )
 
 type Mmap struct {
-	mutex  sync.RWMutex
-	file   *os.File
-	length uint
-	addr   uintptr
+	mutex      sync.RWMutex
+	file       *os.File
+	mmaphandle windows.Handle
+	length     uint
+	addr       uintptr
 }
 
 func NewMmap(path string, length uint) (m *Mmap, err error) {
@@ -46,8 +47,7 @@ func NewMmap(path string, length uint) (m *Mmap, err error) {
 	}
 	m.length = length
 	//进行系统调用实现共享内存
-	handle := windows.Handle(0)
-	handle, err = windows.CreateFileMapping(
+	m.mmaphandle, err = windows.CreateFileMapping(
 		windows.Handle(m.file.Fd()),
 		nil,
 		RWX,
@@ -65,4 +65,20 @@ func NewMmap(path string, length uint) (m *Mmap, err error) {
 		return nil, err
 	}
 	return m, nil
+}
+
+func (m *Mmap) Close() (err error) {
+	err = windows.UnmapViewOfFile(m.addr) //释放已映射空间
+	if err != nil {
+		return err
+	}
+	err = windows.CloseHandle(m.mmaphandle) //关闭文件映射对象
+	if err != nil {
+		return err
+	}
+	err = m.file.Close() //关闭文件描述符
+	if err != nil {
+		return err
+	}
+	return nil
 }
