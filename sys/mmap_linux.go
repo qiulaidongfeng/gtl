@@ -44,13 +44,13 @@ func NewMmap(path string, length int) (m *Mmap, err error) {
 }
 
 func (m *Mmap) Close() (err error) {
-	m.mutex.Lock()         //加锁，保证并发安全
-	defer m.mutex.Unlock() //解锁，保证并发安全
-	err = unix.Munmap(m.memory)
+	m.mutex.Lock()              //加锁，保证并发安全
+	defer m.mutex.Unlock()      //解锁，保证并发安全
+	err = unix.Munmap(m.memory) //释放已映射空间
 	if err != nil {
 		return err
 	}
-	err = m.file.Close()
+	err = m.file.Close() //关闭文件描述符
 	if err != nil {
 		return err
 	}
