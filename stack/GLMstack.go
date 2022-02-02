@@ -99,7 +99,7 @@ func (s *GLMstack) tspushsafetycheck(size uint64) (sizeold uint64) {
 	nsize := atomic.AddUint64(&s.size, size)
 	if nsize >= s.scap {
 		s.mutex.RUnlock()
-		s.scap = s.addcap(nsize)
+		s.scap = s.tsaddcap(nsize)
 		s.mutex.RLock()
 	}
 	sizeold = nsize - size
@@ -117,9 +117,10 @@ func (s *GLMstack) tsaddcap(size uint64) (ncap uint64) {
 		}
 	}
 	nslice := make([]int8, ncap, ncap)
-	for i := uint64(0); i < s.scap; i++ {
-		nslice[i] = s.slice[i]
-	}
+	// for i := uint64(0); i < s.scap; i++ {
+	// 	nslice[i] = s.slice[i]
+	// }
+	copy(nslice, s.slice)
 	s.slice = nslice
 	s.mutex.Unlock()
 	return
