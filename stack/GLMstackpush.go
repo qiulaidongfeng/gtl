@@ -209,7 +209,10 @@ func (s *GLMstack) TsPush(x interface{}) error {
 }
 
 func (s *GLMstack) Pushptr(ptr unsafe.Pointer, size uint64) error {
-	s.pushsafetycheck(size) //入栈安全检查
+	safe := s.pushsafetycheck(size) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + size)
+	}
 	uptr := uintptr(ptr)
 	for i := uint64(0); i < size; i++ {
 		size := s.size + i
