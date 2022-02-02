@@ -3,6 +3,7 @@ package sys
 
 import (
 	"os"
+	"sync"
 
 	"golang.org/x/sys/windows"
 )
@@ -50,7 +51,7 @@ func NewMmap(path string, length uint) (m *Mmap, err error) {
 	m.mmaphandle, err = windows.CreateFileMapping(
 		windows.Handle(m.file.Fd()),
 		nil,
-		RWX,
+		PAGE_RWX,
 		uint32(length>>32),
 		uint32(length),
 		nil)
@@ -60,7 +61,7 @@ func NewMmap(path string, length uint) (m *Mmap, err error) {
 	//使文件大小等于内存页倍数
 	pagelen := length%uint(pagesize) + 1
 	size := pagelen * pagesize
-	m.addr, err = windows.MapViewOfFile(handle, FILE_MAP_RWX, 0, 0, uintptr(size))
+	m.addr, err = windows.MapViewOfFile(m.mmaphandle, FILE_MAP_RWX, 0, 0, uintptr(size))
 	if err != nil {
 		return nil, err
 	}
@@ -81,4 +82,8 @@ func (m *Mmap) Close() (err error) {
 		return err
 	}
 	return nil
+}
+
+func (m *Mmap) Addr() uintptr {
+	return addr
 }
