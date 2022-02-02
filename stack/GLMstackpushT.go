@@ -5,7 +5,10 @@ import (
 )
 
 func (s *GLMstack) Pushint(x int) error {
-	s.pushsafetycheck(Intsize) //入栈安全检查
+	safe := s.pushsafetycheck(Intsize) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Intsize)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -29,7 +32,10 @@ func (s *GLMstack) TsPushint(x int) error {
 }
 
 func (s *GLMstack) Pushint8(x int8) error {
-	s.pushsafetycheck(Int8size) //入栈安全检查
+	safe := s.pushsafetycheck(Int8size) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Int8size)
+	}
 	s.slice[s.size] = x
 	s.size++
 	return nil
@@ -46,7 +52,10 @@ func (s *GLMstack) TsPushint8(x int8) error {
 }
 
 func (s *GLMstack) Pushint16(x int16) error {
-	s.pushsafetycheck(Int16size) //入栈安全检查
+	safe := s.pushsafetycheck(Int16size) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Int16size)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -70,7 +79,10 @@ func (s *GLMstack) TsPushint16(x int16) error {
 }
 
 func (s *GLMstack) Pushint32(x int32) error {
-	s.pushsafetycheck(Int32size) //入栈安全检查
+	safe := s.pushsafetycheck(Int32size) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Int32size)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -94,7 +106,10 @@ func (s *GLMstack) TsPushint32(x int32) error {
 }
 
 func (s *GLMstack) Pushint64(x int64) error {
-	s.pushsafetycheck(Int64size) //入栈安全检查
+	safe := s.pushsafetycheck(Int64size) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Int64size)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -118,7 +133,10 @@ func (s *GLMstack) TsPushint64(x int64) error {
 }
 
 func (s *GLMstack) Pushuint(x uint) error {
-	s.pushsafetycheck(Uintsize) //入栈安全检查
+	safe := s.pushsafetycheck(Uintsize) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Uintsize)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -142,7 +160,10 @@ func (s *GLMstack) TsPushuint(x uint) error {
 }
 
 func (s *GLMstack) Pushuint8(x uint8) error {
-	s.pushsafetycheck(Uint8size) //入栈安全检查
+	safe := s.pushsafetycheck(Uint8size) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Uint8size)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -166,7 +187,10 @@ func (s *GLMstack) TsPushuint8(x uint8) error {
 }
 
 func (s *GLMstack) Pushuint16(x uint16) error {
-	s.pushsafetycheck(Uint16size) //入栈安全检查
+	safe := s.pushsafetycheck(Uint16size) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Uint16size)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -190,7 +214,10 @@ func (s *GLMstack) TsPushuint16(x uint16) error {
 }
 
 func (s *GLMstack) Pushuint32(x uint32) error {
-	s.pushsafetycheck(Uint32size) //入栈安全检查
+	safe := s.pushsafetycheck(Uint32size) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Uint32size)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -214,7 +241,10 @@ func (s *GLMstack) TsPushuint32(x uint32) error {
 }
 
 func (s *GLMstack) Pushuint64(x uint64) error {
-	s.pushsafetycheck(Uint64size) //入栈安全检查
+	safe := s.pushsafetycheck(Uint64size) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Uint64size)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -238,7 +268,10 @@ func (s *GLMstack) TsPushuint64(x uint64) error {
 }
 
 func (s *GLMstack) PushByte(x byte) error {
-	s.pushsafetycheck(Bytesize) //入栈安全检查
+	safe := s.pushsafetycheck(Bytesize) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Bytesize)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -262,7 +295,10 @@ func (s *GLMstack) TsPushByte(x byte) error {
 }
 
 func (s *GLMstack) PushRune(x rune) error {
-	s.pushsafetycheck(Runesize) //入栈安全检查
+	safe := s.pushsafetycheck(Runesize) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Runesize)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -286,7 +322,10 @@ func (s *GLMstack) TsPushRune(x rune) error {
 }
 
 func (s *GLMstack) PushBool(x bool) error {
-	s.pushsafetycheck(Boolsize) //入栈安全检查
+	safe := s.pushsafetycheck(Boolsize) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Boolsize)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -310,7 +349,10 @@ func (s *GLMstack) TsPushBool(x bool) error {
 }
 
 func (s *GLMstack) PushFloat32(x float32) error {
-	s.pushsafetycheck(Float32size) //入栈安全检查
+	safe := s.pushsafetycheck(Float32size) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Float32size)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -334,7 +376,10 @@ func (s *GLMstack) TsPushFloat32(x float32) error {
 }
 
 func (s *GLMstack) PushFloat64(x float64) error {
-	s.pushsafetycheck(Float64size) //入栈安全检查
+	safe := s.pushsafetycheck(Float64size) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Float64size)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -358,7 +403,10 @@ func (s *GLMstack) TsPushFloat64(x float64) error {
 }
 
 func (s *GLMstack) PushUintptr(x uintptr) error {
-	s.pushsafetycheck(Uintptrsize) //入栈安全检查
+	safe := s.pushsafetycheck(Uintptrsize) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Uintptrsize)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -382,7 +430,10 @@ func (s *GLMstack) TsPushUintptr(x uintptr) error {
 }
 
 func (s *GLMstack) PushComplex128(x complex128) error {
-	s.pushsafetycheck(Complex128size) //入栈安全检查
+	safe := s.pushsafetycheck(Complex128size) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Complex128size)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -406,7 +457,10 @@ func (s *GLMstack) TsPushComplex128(x complex128) error {
 }
 
 func (s *GLMstack) PushComplex64(x complex64) error {
-	s.pushsafetycheck(Complex64size) //入栈安全检查
+	safe := s.pushsafetycheck(Complex64size) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Complex64size)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
@@ -430,7 +484,10 @@ func (s *GLMstack) TsPushComplex64(x complex64) error {
 }
 
 func (s *GLMstack) PushInterface(x interface{}) error {
-	s.pushsafetycheck(Interfacesize) //入栈安全检查
+	safe := s.pushsafetycheck(Interfacesize) //入栈安全检查
+	if safe != nil {
+		s.scap = s.addcap(s.size + Interfacesize)
+	}
 	sp := unsafe.Pointer(&(s.slice[0]))
 	sl := s.size
 	sp = unsafe.Pointer(uintptr(sp) + uintptr(sl))
