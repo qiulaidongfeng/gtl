@@ -68,7 +68,7 @@ func (m *Mmap) Read(p []byte) (n int, err error) {
 }
 
 func (m *Mmap) Write(p []byte) (n int, err error) {
-	pn := len(p) - 1
+	pn := len(p)
 	if pn < m.length {
 		return 0, spancesmall
 	}
@@ -81,13 +81,13 @@ func (m *Mmap) Write(p []byte) (n int, err error) {
 }
 
 func (m *Mmap) ReadAt(p []byte, off int64) (n int, err error) {
-	pn := len(p) - 1
+	pn := len(p)
 	m.mutex.Lock() //加锁，保证并发安全
 	for n = int(off); n < pn; n++ {
 		p[n] = m.memory[n]
 	}
 	m.mutex.Unlock() //解锁，保证并发安全
-	n = m.length - n
+	n = m.length - off
 	return n, nil
 }
 
@@ -100,7 +100,7 @@ func (m *Mmap) WriteAt(p []byte, off int64) (n int, err error) {
 	for n = int(off); n < pn; n++ {
 		m.memory[n] = p[n]
 	}
-	n = m.length - n
+	n = m.length - off
 	m.mutex.Unlock() //解锁，保证并发安全
 	return n, nil
 }
