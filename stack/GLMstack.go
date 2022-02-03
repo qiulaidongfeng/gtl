@@ -82,9 +82,10 @@ func (s *GLMstack) addcap(size uint64) (ncap uint64) {
 	nslice := make([]int8, ncap, ncap)
 	// nptr := uintptr(unsafe.Pointer(&nslice[0]))
 	// uptr := uintptr(unsafe.Pointer(&s.slice[0]))
-	for i := uint64(0); i < s.scap; i++ {
-		nslice[i] = s.slice[i]
-	}
+	// for i := uint64(0); i < s.scap; i++ {
+	// 	nslice[i] = s.slice[i]
+	// }
+	copy(nslice, s.slice)
 	s.slice = nslice
 	return
 }
@@ -168,4 +169,20 @@ func (s *GLMstack) TsLoadpopn() int64 {
 
 func (s *GLMstack) TsLoadpushn() int64 {
 	return atomic.LoadInt64(&s.pushn)
+}
+
+func (s *GLMstack) Addcap(ncap uint64) (err error) {
+	nslice := make([]int8, ncap, ncap)
+	copy(nslice, s.slice)
+	s.slice = nslice
+	return nil
+}
+
+func (s *GLMstack) TsAddcap(ncap uint64) (err error) {
+	s.mutex.Lock()
+	nslice := make([]int8, ncap, ncap)
+	copy(nslice, s.slice)
+	s.slice = nslice
+	s.mutex.Rlock()
+	return nil
 }
