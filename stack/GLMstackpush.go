@@ -210,7 +210,7 @@ func (s *GLMstack) TsPush(x interface{}) error {
 
 func (s *GLMstack) Pushptr(ptr unsafe.Pointer, size uint64) error {
 	safe := s.pushsafetycheck(size) //入栈安全检查
-	if safe != nil {
+	if safe != safeOk {
 		s.scap = s.addcap(s.size + size)
 	}
 	uptr := uintptr(ptr)
@@ -225,8 +225,13 @@ func (s *GLMstack) Pushptr(ptr unsafe.Pointer, size uint64) error {
 
 func (s *GLMstack) TsPushptr(ptr unsafe.Pointer, size uint64) error {
 	s.mutex.RLock()
-	s.pushrecord()                       //入栈记录
-	sizeold := s.tspushsafetycheck(size) //入栈安全检查
+	s.pushrecord()                                    //入栈记录
+	sizeold, safe, nsize := s.tspushsafetycheck(size) //入栈安全检查
+	if safe != safeOk {
+		s.mutex.RUnlock()
+		s.scap = s.tsaddcap(nsize)
+		s.mutex.RLock()
+	}
 	uptr := uintptr(ptr)
 	for i := uint64(0); i < size; i++ { //实际入栈
 		sizei := sizeold + i
