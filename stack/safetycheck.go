@@ -1,9 +1,13 @@
 // safetycheck
 package stack
 
+import (
+	"sync/atomic"
+)
+
 const (
-	safeOk         int8 = itoa
-	notEnoughSpace      = 1
+	safeOk int8 = iota
+	notEnoughSpace
 )
 
 func (s *GLMstack) pushsafetycheck(size uint64) (safe int8) {
@@ -13,12 +17,10 @@ func (s *GLMstack) pushsafetycheck(size uint64) (safe int8) {
 	return safeOk
 }
 
-func (s *GLMstack) tspushsafetycheck(size uint64) (sizeold uint64) {
-	nsize := atomic.AddUint64(&s.size, size)
+func (s *GLMstack) tspushsafetycheck(size uint64) (sizeold uint64, safe int8, nsize uint64) {
+	nsize = atomic.AddUint64(&s.size, size)
 	if nsize >= s.scap {
-		s.mutex.RUnlock()
-		s.scap = s.tsaddcap(nsize)
-		s.mutex.RLock()
+		safe = notEnoughSpace
 	}
 	sizeold = nsize - size
 	return
