@@ -8,6 +8,7 @@ import (
 const (
 	safeOk int8 = iota
 	notEnoughSpace
+	insufficientStackContent
 )
 
 func (s *GLMstack) pushsafetycheck(size uint64) (safe int8) {
