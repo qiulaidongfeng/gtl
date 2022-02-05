@@ -27,7 +27,7 @@ func (s *GLMstack) TsPopptr(ptr unsafe.Pointer, size uint64) error {
 	vptr := uintptr(unsafe.Pointer(&s.slice[0])) + uintptr(sizei)
 	uptr := uintptr(ptr)
 	for i := uint64(0); i < size; i++ { //实际出栈
-		*(*int8)(unsafe.Pointer(vptr + (uintptr(i)))) = *(*int8)(unsafe.Pointer(uptr + uintptr(i)))
+		*(*int8)(unsafe.Pointer(uptr + uintptr(i))) = *(*int8)(unsafe.Pointer(vptr + (uintptr(i))))
 	}
 	s.popok() //结束记录
 	s.mutex.RUnlock()
