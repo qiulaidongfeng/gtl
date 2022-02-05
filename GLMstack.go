@@ -161,3 +161,7 @@ func (s *GLMstack) TsAddcap(ncap uint64) (err error) {
 	s.mutex.Unlock()
 	return nil
 }
+
+func (s *GLMstack) Subcap(ncap uint64) (err error) {
+
+}
