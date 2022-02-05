@@ -8,14 +8,14 @@ import (
 const (
 	safeOk int8 = iota
 	notEnoughSpace
-	insufficientStackContent
+	shortageStackContent
 )
 
 func (s *GLMstack) pushsafetycheck(size uint64) (safe int8) {
 	if s.size+size >= s.scap {
 		safe = notEnoughSpace
 	}
-	return safeOk
+	return
 }
 
 func (s *GLMstack) tspushsafetycheck(size uint64) (sizeold uint64, safe int8, nsize uint64) {
@@ -24,5 +24,12 @@ func (s *GLMstack) tspushsafetycheck(size uint64) (sizeold uint64, safe int8, ns
 		safe = notEnoughSpace
 	}
 	sizeold = nsize - size
+	return
+}
+
+func (s *GLMstack) popsafetycheck(size uint64) (safe int8) {
+	if size > s.size {
+		safe = shortageStackContent
+	}
 	return
 }
