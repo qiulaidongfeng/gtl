@@ -41,3 +41,10 @@ func (s *GLMstack) addcapsafetycheck(ncap uint64) (safe int8) {
 	}
 	return
 }
+
+func (s *GLMstack) subcapsafetycheck(ncap uint64) (safe int8) {
+	if ncap >= s.scap {
+		safe = ncapSmall
+	}
+	return
+}
