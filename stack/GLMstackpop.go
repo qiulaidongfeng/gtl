@@ -7,12 +7,15 @@ import (
 )
 
 func (s *GLMstack) Popptr(ptr unsafe.Pointer, size uint64) error {
-	sizei := s.size
+	safe := popsafetycheck(size) //出栈安全检查
+	if safe != safeOk {
+		return StackContentShortage
+	}
 	s.size -= size
-	vptr := uintptr(unsafe.Pointer(&s.slice[0])) + uintptr(sizei)
+	vptr := uintptr(unsafe.Pointer(&s.slice[0])) + uintptr(s.size)
 	uptr := uintptr(ptr)
 	for i := uint64(0); i < size; i++ {
-		*(*int8)(unsafe.Pointer(vptr + (uintptr(i)))) = *(*int8)(unsafe.Pointer(uptr + uintptr(i)))
+		*(*int8)(unsafe.Pointer(uptr + uintptr(i))) = *(*int8)(unsafe.Pointer(vptr + (uintptr(i))))
 	}
 	return nil
 }
