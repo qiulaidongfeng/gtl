@@ -171,6 +171,10 @@ func (s *GLMstack) TsAddcap(ncap uint64) (err error) {
 }
 
 func (s *GLMstack) Subcap(ncap uint64) (err error) {
+	safe := addcapsafetycheck(ncap) //新容量安全检查
+	if safe != safeOk {
+		return StackNcapBig
+	}
 	nslice := make([]int8, ncap, ncap)
 	copy(nslice, s.slice)
 	s.slice = nslice
