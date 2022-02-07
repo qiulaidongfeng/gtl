@@ -1,12 +1,25 @@
 // error
 package errors
 
+import (
+	"errors"
+	"reflect"
+)
+
 //错误接口
 type Error interface {
 	//go自带错误接口
 	error
 	//返回不带栈踪迹信息的方法
 	ErrorNoStack() string
+}
+
+//带有包装错误的错误接口
+type WrapErrorType interface {
+	//go自带错误接口
+	error
+	//返回被包装错误的方法
+	Unwrap(error) error
 }
 
 type Errorstring string
@@ -35,14 +48,32 @@ func Unwrap(err error) error {
 }
 
 func Is(err, target error) bool {
-	if target == nil {
-		return err == target
-	}
+	return errors.Is(err, target)
+}
+
+func As(err error, target interface{}) bool {
+	return errors.As(err, target)
+}
+
+//比较没带有被包装错误的错误与compared（被比较的）错误是否相等
+func TypeEqual(err, compared error) bool {
+	errtype := reflect.TypeOf(err)
+	comparedtype := reflect.TypeOf(compared)
+	return errtype == comparedtype
+}
+
+/*
+	比较err(带有被包装错误的错误)与compared（被比较的）错误是否相等
+	err需要实现WrapErrorType接口
+*/
+func AllTypeEqual(err WrapErrorType, compared error) bool {
 	for {
-		if x, ok := err.(interface{ Is(error) bool }); ok && x.Is(target) {
+		errtype := reflect.TypeOf(err)
+		comparedtype := reflect.TypeOf(compared)
+		if errtype == comparedtype {
 			return true
 		}
-		if err = Unwrap(err); err == nil {
+		if err, ok = err.Unwrap().(WrapErrorType); ok == false {
 			return false
 		}
 	}
