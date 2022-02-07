@@ -7,21 +7,21 @@ type WrapError struct {
 	message string
 }
 
-func (err WrapError) Error() string {
+func (err *WrapError) Error() string {
 	return err.message + err.err.Error()
 }
 
 //返回被包装的错误
-func (err WrapError) Unwrap() error {
+func (err *WrapError) Unwrap() error {
 	return err.err
 }
 
 //包装错误
 func WithMessage(err error, message string) error {
-	return WrapError{err: err, message: message}
+	return &WrapError{err: err, message: message}
 }
 
 //包装错误
 func NewWrapError(err error, message string) error {
-	return WrapError{err: err, message: message}
+	return &WrapError{err: err, message: message}
 }
