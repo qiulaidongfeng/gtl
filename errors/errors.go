@@ -19,7 +19,17 @@ type WrapErrorType interface {
 	//go自带错误接口
 	error
 	//返回被包装错误的方法
-	Unwrap(error) error
+	Unwrap() error
+}
+
+//增强版带有包装错误的错误接口
+type PlusWrapError interface {
+	//go自带错误接口
+	error
+	//返回被包装错误的方法
+	Unwrap() error
+	//返回不带栈踪迹信息的方法
+	ErrorNoStack() string
 }
 
 type Errorstring string
@@ -76,24 +86,25 @@ func AllTypeEqual(err WrapErrorType, compared error) (int, bool) {
 		if errtype == comparedtype {
 			return n, true
 		}
-		if err, ok = err.Unwrap(err).(WrapErrorType); ok == false {
+		if err, ok = err.Unwrap().(WrapErrorType); ok == false {
 			return n, false
 		}
 		n++
 	}
 }
 
-func Cause(err error) error {
-	ok := false
-	if err, ok := err.(interface{ Cause() error }); ok == true {
-		return err.Cause()
-	}
-	for {
-		if err1, ok := err.Unwrap(err).(WrapErrorType); ok == false {
-			return err
-		}
-		if err, ok = err.(interface{ Unwrap() error }); ok == false {
-			return err
-		}
-	}
-}
+// func Cause(err error) error {
+// 	ok := false
+// 	if err, ok := err.(interface{ Cause() error }); ok == true {
+// 		return err.Cause()
+// 	}
+// 	for {
+// 		if err1, ok := err.Unwrap().(WrapErrorType); ok == false {
+// 			return err
+// 		}
+// 		if err, ok = err.(interface{ Unwrap() error }); ok == false {
+// 			return err
+// 		}
+// 		err = err.Unwrap()
+// 	}
+// }
