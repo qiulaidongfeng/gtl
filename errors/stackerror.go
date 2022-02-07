@@ -19,13 +19,13 @@ type StackError struct {
 }
 
 //创建带有栈踪迹信息的错误
-func NewStackError(err string, all bool) Error {
+func NewStackError(err string, all bool) PlusWrapError {
 	errorerr := Errorstring(err)
 	return &StackError{err: &errorerr, stack: string(Stack(all))}
 }
 
 //包装栈踪迹信息进错误
-func WrapStackError(err error, all bool) Error {
+func WrapStackError(err error, all bool) PlusWrapError {
 	return &StackError{err: err, stack: string(Stack(all))}
 }
 
