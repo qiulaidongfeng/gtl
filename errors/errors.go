@@ -93,18 +93,18 @@ func AllTypeEqual(err WrapErrorType, compared error) (int, bool) {
 	}
 }
 
-// func Cause(err error) error {
-// 	ok := false
-// 	if err, ok := err.(interface{ Cause() error }); ok == true {
-// 		return err.Cause()
-// 	}
-// 	for {
-// 		if err1, ok := err.Unwrap().(WrapErrorType); ok == false {
-// 			return err
-// 		}
-// 		if err, ok = err.(interface{ Unwrap() error }); ok == false {
-// 			return err
-// 		}
-// 		err = err.Unwrap()
-// 	}
-// }
+//返回最后一层错误
+func Cause(err error) error {
+	ok := false
+	var err1 WrapErrorType
+	if err, ok := err.(interface{ Cause() error }); ok == true {
+		return err.Cause()
+	}
+	for {
+		if err1, ok = err.(WrapErrorType); ok == true {
+			err = err1.Unwrap()
+		} else {
+			return err
+		}
+	}
+}
