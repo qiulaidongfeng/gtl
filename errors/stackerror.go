@@ -20,23 +20,24 @@ type StackError struct {
 
 //创建带有栈踪迹信息的错误
 func NewStackError(err string, all bool) Error {
-	return StackError{err: Errorstring(err), stack: string(Stack(all))}
+	errorerr := Errorstring(err)
+	return &StackError{err: &errorerr, stack: string(Stack(all))}
 }
 
 //包装栈踪迹信息进错误
 func WrapStackError(err error, all bool) Error {
-	return StackError{err: err, stack: string(Stack(all))}
+	return &StackError{err: err, stack: string(Stack(all))}
 }
 
-func (err StackError) Error() string {
+func (err *StackError) Error() string {
 	return err.err.Error() + "\n" + err.stack
 }
 
-func (err StackError) Unwrap() error {
+func (err *StackError) Unwrap() error {
 	return err.err
 }
 
-func (err StackError) ErrorNoStack() string {
+func (err *StackError) ErrorNoStack() string {
 	return err.err.Error()
 }
 
