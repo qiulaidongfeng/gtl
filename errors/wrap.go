@@ -17,3 +17,7 @@ func (err WrapError) Unwrap() error {
 func WithMessage(err error, message string) error {
 	return WrapError{err: err, message: message}
 }
+
+func WrapError(err error, message string) error {
+	return WrapError{err: err, message: message}
+}
