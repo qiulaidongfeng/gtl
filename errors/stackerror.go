@@ -14,21 +14,30 @@ var (
 
 //带有栈踪迹信息的错误
 type StackError struct {
-	err   string
+	err   error
 	stack string
 }
 
 //创建带有栈踪迹信息的错误
 func NewStackError(err string, all bool) Error {
+	return StackError{err: Errorstring(err), stack: string(Stack(all))}
+}
+
+//包装栈踪迹信息进错误
+func WrapStackError(err error, all bool) Error {
 	return StackError{err: err, stack: string(Stack(all))}
 }
 
 func (err StackError) Error() string {
-	return err.err + "\n" + err.stack
+	return err.err.Error() + "\n" + err.stack
+}
+
+func (err StackError) Unwrap() error {
+	return err.err
 }
 
 func (err StackError) ErrorNoStack() string {
-	return err.err
+	return err.err.Error()
 }
 
 //返回栈踪迹信息
