@@ -65,16 +65,35 @@ func TypeEqual(err, compared error) bool {
 /*
 	比较err(带有被包装错误的错误)与compared（被比较的）错误是否相等
 	err需要实现WrapErrorType接口
+	返回第一个相等的错误值的被包装的层数，0表示顶层
 */
-func AllTypeEqual(err WrapErrorType, compared error) bool {
+func AllTypeEqual(err WrapErrorType, compared error) (int, bool) {
+	n := 0
+	ok := false
 	for {
 		errtype := reflect.TypeOf(err)
 		comparedtype := reflect.TypeOf(compared)
 		if errtype == comparedtype {
-			return true
+			return n, true
 		}
-		if err, ok = err.Unwrap().(WrapErrorType); ok == false {
-			return false
+		if err, ok = err.Unwrap(err).(WrapErrorType); ok == false {
+			return n, false
+		}
+		n++
+	}
+}
+
+func Cause(err error) error {
+	ok := false
+	if err, ok := err.(interface{ Cause() error }); ok == true {
+		return err.Cause()
+	}
+	for {
+		if err1, ok := err.Unwrap(err).(WrapErrorType); ok == false {
+			return err
+		}
+		if err, ok = err.(interface{ Unwrap() error }); ok == false {
+			return err
 		}
 	}
 }
