@@ -17,11 +17,6 @@ func (err *WrapError) Unwrap() error {
 }
 
 //包装错误
-func WithMessage(err error, message string) WrapErrorType {
-	return &WrapError{err: err, message: message}
-}
-
-//包装错误
 func NewWrapError(err error, message string) WrapErrorType {
 	return &WrapError{err: err, message: message}
 }

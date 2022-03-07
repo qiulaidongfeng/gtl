@@ -7,7 +7,7 @@ import (
 )
 
 //错误接口
-type Error interface {
+type StackError interface {
 	//go自带错误接口
 	error
 	//返回不带栈踪迹信息的方法
@@ -51,7 +51,7 @@ func Unwrap(err error) error {
 	u, ok := err.(interface {
 		Unwrap() error
 	})
-	if ok == false {
+	if !ok {
 		return nil
 	}
 	return u.Unwrap()
@@ -73,7 +73,7 @@ func TypeEqual(err, compared error) bool {
 }
 
 /*
-	比较err(带有被包装错误的错误)与compared（被比较的）错误是否相等
+	比较err(带有被包装错误的错误)中的所有错误是否存在与compared（被比较的错误）相等的
 	err需要实现WrapErrorType接口
 	返回第一个相等的错误值的被包装的层数，0表示顶层
 */

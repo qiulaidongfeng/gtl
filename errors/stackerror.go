@@ -2,6 +2,7 @@
 package errors
 
 import (
+	"fmt"
 	"runtime"
 )
 
@@ -13,31 +14,31 @@ var (
 )
 
 //带有栈踪迹信息的错误
-type StackError struct {
+type WrapStackError struct {
 	err   error
-	stack string
+	stack []byte
 }
 
 //创建带有栈踪迹信息的错误
-func NewStackError(err string, all bool) PlusWrapError {
+func NewWrapStackError(err string, all bool) PlusWrapError {
 	errorerr := Errorstring(err)
-	return &StackError{err: &errorerr, stack: string(Stack(all))}
+	return &WrapStackError{err: &errorerr, stack: Stack(all)}
 }
 
-//包装栈踪迹信息进错误
-func WrapStackError(err error, all bool) PlusWrapError {
-	return &StackError{err: err, stack: string(Stack(all))}
+//包装当前栈信息(
+func WrapFuncStackError(err *WrapStackError) {
+	err.stack = append(callStack(), err.stack...)
 }
 
-func (err *StackError) Error() string {
-	return err.err.Error() + "\n" + err.stack
+func (err *WrapStackError) Error() string {
+	return err.err.Error() + "\n" + string(err.stack)
 }
 
-func (err *StackError) Unwrap() error {
+func (err *WrapStackError) Unwrap() error {
 	return err.err
 }
 
-func (err *StackError) ErrorNoStack() string {
+func (err *WrapStackError) ErrorNoStack() string {
 	return err.err.Error()
 }
 
@@ -63,4 +64,14 @@ func Stack(all bool) []byte {
 			buf = make([]byte, (buflen + buflen/4))
 		}
 	}
+}
+
+func callStack() []byte {
+	pc, _, _, ok := runtime.Caller(2)
+	if !ok {
+		return nil
+	}
+	call := runtime.FuncForPC(pc)
+	file, line := call.FileLine(pc)
+	return []byte(fmt.Sprint(call.Name(), "()", "\n\t", file, line))
 }
