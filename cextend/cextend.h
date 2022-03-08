@@ -1,7 +1,7 @@
 #ifndef CEXTEND
 #define CEXTEND
 #include <stdint.h>
-#include <memory.h>
-
+#include <string.h>
+#include <stdlib.h>
 
 #endif // CEXTEND

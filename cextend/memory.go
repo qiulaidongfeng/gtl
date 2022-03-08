@@ -2,8 +2,8 @@
 package cextend
 
 /*
-	#cgo CFLAGS: -g -O3 -march=corei7 -fPIC -I./C
-	#include <cextend.h>
+	#cgo CFLAGS: -g -O3 -march=corei7
+	#include "cextend.h"
 */
 import "C"
 
@@ -12,13 +12,23 @@ import (
 	"unsafe"
 )
 
+func Realloc(ptr unsafe.Pointer, size uint) (nptr unsafe.Pointer) {
+	nptr = C.realloc(ptr, C.size_t(size))
+	return
+}
+
 func Malloc(size uint) (ptr unsafe.Pointer) {
-	ptr = C.Malloc(C.ulong(size))
+	ptr = C.malloc(C.size_t(size))
+	return
+}
+
+func Calloc(nitems uint, size uint) (ptr unsafe.Pointer) {
+	ptr = C.calloc(C.size_t(nitems), C.size_t(size))
 	return
 }
 
 func Free(ptr unsafe.Pointer) {
-	C.Free(ptr)
+	C.free(ptr)
 	return
 }
 
@@ -27,8 +37,8 @@ func Memcpy(dest, src unsafe.Pointer, n uint) {
 	cdest := gcdest.Value().(unsafe.Pointer)
 	gcsrc := cgo.NewHandle(src)
 	csrc := gcsrc.Value().(unsafe.Pointer)
-	C.Memcpy(C.uintptr_t(uintptr(cdest)), C.uintptr_t(uintptr(csrc)), C.ulong(n))
-	gcdest.Delete()
-	gcsrc.Delete()
+	defer gcdest.Delete()
+	defer gcsrc.Delete()
+	C.memcpy(cdest, csrc, C.size_t(n))
 	return
 }
