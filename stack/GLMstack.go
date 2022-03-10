@@ -147,13 +147,10 @@ func (s *GLMstack) TsLoadpushn() int64 {
 }
 
 func (s *GLMstack) Addcap(ncap uint64) (err error) {
-<<<<<<< HEAD
 	safe := addcapsafetycheck(ncap) //新容量安全检查
 	if safe != safeOk {
 		return StackNcapSmall
 	}
-=======
->>>>>>> c91b074acab5ede5c2be5087800827f414808c76
 	nslice := make([]int8, ncap, ncap)
 	copy(nslice, s.slice)
 	s.slice = nslice
@@ -162,7 +159,6 @@ func (s *GLMstack) Addcap(ncap uint64) (err error) {
 
 func (s *GLMstack) TsAddcap(ncap uint64) (err error) {
 	s.mutex.Lock()
-<<<<<<< HEAD
 	defer s.mutex.Unlock()
 	safe := addcapsafetycheck(ncap) //新容量安全检查
 	if safe != safeOk {
@@ -175,7 +171,7 @@ func (s *GLMstack) TsAddcap(ncap uint64) (err error) {
 }
 
 func (s *GLMstack) Subcap(ncap uint64) (err error) {
-	safe := addcapsafetycheck(ncap) //新容量安全检查
+	safe := subcapsafetycheck(ncap) //新容量安全检查
 	if safe != safeOk {
 		return StackNcapBig
 	}
@@ -188,18 +184,13 @@ func (s *GLMstack) Subcap(ncap uint64) (err error) {
 func (s *GLMstack) TsSubcap(ncap uint64) (err error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	safe := addcapsafetycheck(ncap) //新容量安全检查
+	safe := subcapsafetycheck(ncap) //新容量安全检查
 	if safe != safeOk {
 		return StackNcapBig
 	}
 	nslice := make([]int8, ncap, ncap)
 	copy(nslice, s.slice)
 	s.slice = nslice
-=======
-	nslice := make([]int8, ncap, ncap)
-	copy(nslice, s.slice)
-	s.slice = nslice
 	s.mutex.Unlock()
->>>>>>> c91b074acab5ede5c2be5087800827f414808c76
 	return nil
 }
