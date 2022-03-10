@@ -9,7 +9,10 @@ const (
 	safeOk int8 = iota
 	notEnoughSpace
 	shortageStackContent
+<<<<<<< HEAD
 	ncapSmall
+=======
+>>>>>>> c91b074acab5ede5c2be5087800827f414808c76
 )
 
 func (s *GLMstack) pushsafetycheck(size uint64) (safe int8) {
@@ -34,6 +37,7 @@ func (s *GLMstack) popsafetycheck(size uint64) (safe int8) {
 	}
 	return
 }
+<<<<<<< HEAD
 
 func (s *GLMstack) addcapsafetycheck(ncap uint64) (safe int8) {
 	if ncap <= s.scap {
@@ -48,3 +52,5 @@ func (s *GLMstack) subcapsafetycheck(ncap uint64) (safe int8) {
 	}
 	return
 }
+=======
+>>>>>>> c91b074acab5ede5c2be5087800827f414808c76
