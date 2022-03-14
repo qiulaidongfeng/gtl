@@ -1,4 +1,3 @@
-// mmap_windows
 package sys
 
 import (

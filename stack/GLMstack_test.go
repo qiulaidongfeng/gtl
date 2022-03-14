@@ -4,21 +4,19 @@ package stack
 import (
 	"testing"
 	"unsafe"
-
-	"gtl/stack"
 )
 
-var s *stack.GLMstack = stack.NewGLMstack()
+var s *GLMstack = NewGLMstack()
 
-func Benchmark_NewGLMstack(b *testing.B) {
+func Benchmark_GLM_NewGLMstack(b *testing.B) {
 	b.SetBytes(1)
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		s = stack.NewGLMstack()
+		s = NewGLMstack()
 	}
 }
 
-func Benchmark_Size(b *testing.B) {
+func Benchmark_GLM_Size(b *testing.B) {
 	b.SetBytes(1)
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -26,7 +24,7 @@ func Benchmark_Size(b *testing.B) {
 	}
 }
 
-func Benchmark_Tssize(b *testing.B) {
+func Benchmark_GLM_Tssize(b *testing.B) {
 	b.SetBytes(1)
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -34,7 +32,7 @@ func Benchmark_Tssize(b *testing.B) {
 	}
 }
 
-func Benchmark_Clear(b *testing.B) {
+func Benchmark_GLM_Clear(b *testing.B) {
 	b.SetBytes(1)
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -42,7 +40,7 @@ func Benchmark_Clear(b *testing.B) {
 	}
 }
 
-func Benchmark_Tsclear(b *testing.B) {
+func Benchmark_GLM_Tsclear(b *testing.B) {
 	b.SetBytes(1)
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -50,7 +48,7 @@ func Benchmark_Tsclear(b *testing.B) {
 	}
 }
 
-func Benchmark_TsLoadpp(b *testing.B) {
+func Benchmark_GLM_TsLoadpp(b *testing.B) {
 	b.SetBytes(1)
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -58,7 +56,7 @@ func Benchmark_TsLoadpp(b *testing.B) {
 	}
 }
 
-func Benchmark_TsLoadpopn(b *testing.B) {
+func Benchmark_GLM_TsLoadpopn(b *testing.B) {
 	b.SetBytes(1)
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -66,7 +64,7 @@ func Benchmark_TsLoadpopn(b *testing.B) {
 	}
 }
 
-func Benchmark_TsLoadpushn(b *testing.B) {
+func Benchmark_GLM_TsLoadpushn(b *testing.B) {
 	b.SetBytes(1)
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
@@ -74,8 +72,8 @@ func Benchmark_TsLoadpushn(b *testing.B) {
 	}
 }
 
-func Benchmark_Pushptr(b *testing.B) {
-	var s1 *stack.GLMstack = stack.NewGLMstack()
+func Benchmark_GLM_Pushptr(b *testing.B) {
+	var s1 *GLMstack = NewGLMstack()
 	p := new(int)
 	up := unsafe.Pointer(p)
 	b.SetBytes(1)
@@ -85,8 +83,8 @@ func Benchmark_Pushptr(b *testing.B) {
 	}
 }
 
-func Benchmark_TsPushptr(b *testing.B) {
-	var s1 *stack.GLMstack = stack.NewGLMstack()
+func Benchmark_GLM_TsPushptr(b *testing.B) {
+	var s1 *GLMstack = NewGLMstack()
 	p := new(int)
 	up := unsafe.Pointer(p)
 	b.SetBytes(1)
@@ -96,8 +94,8 @@ func Benchmark_TsPushptr(b *testing.B) {
 	}
 }
 
-func Benchmark_Pushint8(b *testing.B) {
-	var s1 *stack.GLMstack = stack.NewGLMstack()
+func Benchmark_GLM_Pushint8(b *testing.B) {
+	var s1 *GLMstack = NewGLMstack()
 	p := int8(9)
 	b.SetBytes(1)
 	b.ReportAllocs()
@@ -106,8 +104,8 @@ func Benchmark_Pushint8(b *testing.B) {
 	}
 }
 
-func Benchmark_TsPushint8(b *testing.B) {
-	var s1 *stack.GLMstack = stack.NewGLMstack()
+func Benchmark_GLM_TsPushint8(b *testing.B) {
+	var s1 *GLMstack = NewGLMstack()
 	p := int8(9)
 	b.SetBytes(1)
 	b.ReportAllocs()

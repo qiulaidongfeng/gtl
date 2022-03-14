@@ -7,7 +7,7 @@ import (
 )
 
 func (s *GLMstack) Popptr(ptr unsafe.Pointer, size uint64) error {
-	safe := popsafetycheck(size) //出栈安全检查
+	safe := s.popsafetycheck(size) //出栈安全检查
 	if safe != safeOk {
 		return StackContentShortage
 	}

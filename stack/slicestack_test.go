@@ -1,11 +1,10 @@
 package stack
 
 import (
-	. "gtl/stack"
 	"testing"
 )
 
-func Benchmark_Newslicestack(b *testing.B) {
+func Benchmark_Slice_NewSlicestack(b *testing.B) {
 	b.SetBytes(2)
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -14,7 +13,7 @@ func Benchmark_Newslicestack(b *testing.B) {
 	}
 }
 
-func Benchmark_Size(b *testing.B) {
+func Benchmark_Silce_Size(b *testing.B) {
 	b.SetBytes(2)
 	s := Newslicestack()
 	b.ReportAllocs()
@@ -24,17 +23,17 @@ func Benchmark_Size(b *testing.B) {
 	}
 }
 
-func Benchmark_Tssize(b *testing.B) {
+func Benchmark_Slice_TsSize(b *testing.B) {
 	b.SetBytes(2)
 	s := Newslicestack()
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = s.Tssize()
+		_ = s.TsSize()
 	}
 }
 
-func Benchmark_Clear(b *testing.B) {
+func Benchmark_Slice_Clear(b *testing.B) {
 	b.SetBytes(2)
 	s := Newslicestack()
 	b.ReportAllocs()
@@ -44,17 +43,17 @@ func Benchmark_Clear(b *testing.B) {
 	}
 }
 
-func Benchmark_Tsclear(b *testing.B) {
+func Benchmark_Slice_TsClear(b *testing.B) {
 	b.SetBytes(2)
 	s := Newslicestack()
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s.Tsclear()
+		s.TsClear()
 	}
 }
 
-func Benchmark_Push(b *testing.B) {
+func Benchmark_Slice_Push(b *testing.B) {
 	b.SetBytes(2)
 	s := Newslicestack()
 	b.ReportAllocs()
@@ -64,23 +63,13 @@ func Benchmark_Push(b *testing.B) {
 	}
 }
 
-func Benchmark_Tspush(b *testing.B) {
+func Benchmark_Slice_PushAndPop(b *testing.B) {
 	b.SetBytes(2)
 	s := Newslicestack()
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s.Tspush(5326)
-	}
-}
-
-func Benchmark_Pop(b *testing.B) {
-	s := Newslicestack()
-	var err error
-	b.ReportAllocs()
-	b.SetBytes(2)
-	for i := 0; i < b.N; i++ {
-		s.Push(90)
+		s.Push(5326)
 		_, err = s.Pop()
 		if err != nil {
 			panic(err)
@@ -88,14 +77,14 @@ func Benchmark_Pop(b *testing.B) {
 	}
 }
 
-func Benchmark_Tspop(b *testing.B) {
-	s := Newslicestack()
-	var err error
-	b.ReportAllocs()
+func Benchmark_Slice_TsPushAndTsPop(b *testing.B) {
 	b.SetBytes(2)
+	s := Newslicestack()
+	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		s.Push(77)
-		_, err = s.Tspop()
+		s.TsPush(5326)
+		_, err = s.TsPop()
 		if err != nil {
 			panic(err)
 		}

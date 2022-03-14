@@ -10,6 +10,10 @@ var (
 	StackPushFail        error = errors.New("Stack push fail")
 	StackPopFail         error = errors.New("Stack pop fail")
 	StackClearFail       error = errors.New("Stack clear fail")
+	StackAddcapFail      error = errors.New("Stack addcap fail")
+	StackSubcapFail      error = errors.New("Stack subcap fail")
+	StackNcapSmall       error = NewStackError(StackAddcapFail, "ncap small")
+	StackNcapBig         error = NewStackError(StackSubcapFail, "ncap big")
 	StackContentShortage error = NewStackError(StackPopFail, "Stack content shortage")
 )
 

@@ -1,4 +1,3 @@
-// memory_test
 package cextend
 
 import (

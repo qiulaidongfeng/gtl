@@ -1,4 +1,3 @@
-// stckerror
 package errors
 
 import (
@@ -19,13 +18,13 @@ type WrapStackError struct {
 	stack []byte
 }
 
-//创建带有栈踪迹信息的错误
+//创建带有栈踪迹信息的错误，返回的是WrapStackError结构体
 func NewWrapStackError(err string, all bool) PlusWrapError {
 	errorerr := Errorstring(err)
 	return &WrapStackError{err: &errorerr, stack: Stack(all)}
 }
 
-//包装当前栈信息(
+//包装当前栈信息
 func WrapFuncStackError(err *WrapStackError) {
 	err.stack = append(callStack(), err.stack...)
 }

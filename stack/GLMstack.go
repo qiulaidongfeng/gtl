@@ -1,4 +1,3 @@
-// gsstack
 package stack
 
 import (
@@ -12,12 +11,14 @@ const (
 	poppp  int64 = 1
 )
 
+//操作时间
 const (
 	Poptime  = int64(70)
 	Pushtime = int64(140)
 	Waittime = int64(200)
 )
 
+//类型大小
 const (
 	Int8size       uint64 = uint64((unsafe.Sizeof(int8(1))))
 	Int16size      uint64 = uint64((unsafe.Sizeof(int16(1))))
@@ -147,6 +148,10 @@ func (s *GLMstack) TsLoadpushn() int64 {
 }
 
 func (s *GLMstack) Addcap(ncap uint64) (err error) {
+	safe := s.addcapsafetycheck(ncap) //新容量安全检查
+	if safe != safeOk {
+		return StackNcapSmall
+	}
 	nslice := make([]int8, ncap, ncap)
 	copy(nslice, s.slice)
 	s.slice = nslice
@@ -155,6 +160,35 @@ func (s *GLMstack) Addcap(ncap uint64) (err error) {
 
 func (s *GLMstack) TsAddcap(ncap uint64) (err error) {
 	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	safe := s.addcapsafetycheck(ncap) //新容量安全检查
+	if safe != safeOk {
+		return StackNcapSmall
+	}
+	nslice := make([]int8, ncap, ncap)
+	copy(nslice, s.slice)
+	s.slice = nslice
+	return nil
+}
+
+func (s *GLMstack) Subcap(ncap uint64) (err error) {
+	safe := s.subcapsafetycheck(ncap) //新容量安全检查
+	if safe != safeOk {
+		return StackNcapBig
+	}
+	nslice := make([]int8, ncap, ncap)
+	copy(nslice, s.slice)
+	s.slice = nslice
+	return nil
+}
+
+func (s *GLMstack) TsSubcap(ncap uint64) (err error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	safe := s.subcapsafetycheck(ncap) //新容量安全检查
+	if safe != safeOk {
+		return StackNcapBig
+	}
 	nslice := make([]int8, ncap, ncap)
 	copy(nslice, s.slice)
 	s.slice = nslice

@@ -1,4 +1,3 @@
-// error
 package sys
 
 import (
