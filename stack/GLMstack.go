@@ -147,7 +147,7 @@ func (s *GLMstack) TsLoadpushn() int64 {
 }
 
 func (s *GLMstack) Addcap(ncap uint64) (err error) {
-	safe := addcapsafetycheck(ncap) //新容量安全检查
+	safe := s.addcapsafetycheck(ncap) //新容量安全检查
 	if safe != safeOk {
 		return StackNcapSmall
 	}
@@ -160,7 +160,7 @@ func (s *GLMstack) Addcap(ncap uint64) (err error) {
 func (s *GLMstack) TsAddcap(ncap uint64) (err error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	safe := addcapsafetycheck(ncap) //新容量安全检查
+	safe := s.addcapsafetycheck(ncap) //新容量安全检查
 	if safe != safeOk {
 		return StackNcapSmall
 	}
@@ -171,7 +171,7 @@ func (s *GLMstack) TsAddcap(ncap uint64) (err error) {
 }
 
 func (s *GLMstack) Subcap(ncap uint64) (err error) {
-	safe := subcapsafetycheck(ncap) //新容量安全检查
+	safe := s.subcapsafetycheck(ncap) //新容量安全检查
 	if safe != safeOk {
 		return StackNcapBig
 	}
@@ -184,7 +184,7 @@ func (s *GLMstack) Subcap(ncap uint64) (err error) {
 func (s *GLMstack) TsSubcap(ncap uint64) (err error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	safe := subcapsafetycheck(ncap) //新容量安全检查
+	safe := s.subcapsafetycheck(ncap) //新容量安全检查
 	if safe != safeOk {
 		return StackNcapBig
 	}
