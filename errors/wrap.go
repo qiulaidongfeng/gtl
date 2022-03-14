@@ -1,4 +1,3 @@
-// wrap
 package errors
 
 //被包装的错误类型
@@ -16,7 +15,7 @@ func (err *WrapError) Unwrap() error {
 	return err.err
 }
 
-//包装错误
+//包装错误，返回的是WrapError结构体
 func NewWrapError(err error, message string) WrapErrorType {
 	return &WrapError{err: err, message: message}
 }

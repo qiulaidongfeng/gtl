@@ -1,10 +1,7 @@
-// slist_test.go
 package list
 
 import (
 	"testing"
-
-	. "gtl/list"
 )
 
 func Benchmark_Newslist(b *testing.B) {

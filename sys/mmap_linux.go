@@ -1,4 +1,3 @@
-// mmap_linux
 package sys
 
 import (
