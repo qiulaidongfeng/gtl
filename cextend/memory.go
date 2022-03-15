@@ -29,7 +29,7 @@ func Calloc(nitems uint, size uint) (ptr unsafe.Pointer) {
 	return
 }
 
-//C语言<stdlib.h>中提供的Free函数的go语言API
+//C语言<stdlib.h>中提供的free函数的go语言API
 func Free(ptr unsafe.Pointer) {
 	C.free(ptr)
 	return
