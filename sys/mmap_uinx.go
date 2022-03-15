@@ -53,12 +53,12 @@ func NewMmap(path string, length int) (m *Mmap, err error) {
 //以自定义模式与自定义权限位打开文件，自定义是否读写执行
 func NewMmapAll(path string, osflag int, perm os.FileMode, length int, prot int, fileflag int) (m *Mmap, err error) {
 	//打开文件
-	m.file, err = os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0777)
+	m.file, err = os.OpenFile(path, os, perm)
 	if err != nil {
 		return nil, err
 	}
 	//改变文件大小为length
-	err = m.file.Truncate(int64(length))
+	_, err = m1.file.Seek(0, 0)
 	if err != nil {
 		return nil, err
 	}

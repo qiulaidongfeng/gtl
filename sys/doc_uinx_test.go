@@ -1,9 +1,12 @@
+//go:build aix || darwin || freebsd || linux || netbsd || openbsd || solaris || dragonfly
+// +build aix darwin freebsd linux netbsd openbsd solaris dragonfly
+
 package sys
 
-func ExampleNewMmap_windows() {
+func ExampleNewMmap_uinx() {
 	path := "文件路径"
 	//文件映射起始地址离开头偏移量
-	length := uint(0)
+	length := 0
 	mmap, err := NewMmap(path, length)
 	//判断是否存在错误
 	if err != nil {
