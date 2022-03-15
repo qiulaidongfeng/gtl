@@ -1,4 +1,4 @@
-package sys_test
+package sys
 
 func ExampleNewMmap() {
 	path := "文件路径"
