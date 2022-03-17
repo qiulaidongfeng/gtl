@@ -16,7 +16,7 @@ const (
 	PAGE_RW = windows.PAGE_READWRITE
 	//页面可读，可写，可执行
 	PAGE_WX = windows.PAGE_EXECUTE_READ
-	//页面可读，可写，可执行
+	//页面可读，可写
 	PAGE_RWX = PAGE_RW
 	//写复制
 	PAGE_WRITECOPY = windows.PAGE_EXECUTE_WRITECOPY
