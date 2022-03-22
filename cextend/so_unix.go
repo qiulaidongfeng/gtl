@@ -58,5 +58,5 @@ func Dlclose(handle unsafe.Pointer) int {
 //C语言#include <dlfcn.h>提供的dlerror函数的go语言API
 func Dlerror() string {
 	ret := C.dlerror()
-	return string(ret)
+	return C.GoString(ret)
 }
