@@ -50,23 +50,24 @@ func NewDLL(name string) (d *DLL, err error) {
 func NewDLLAll(name string, mode int) (d *DLL, err error) {
 	d.name = name
 	d.addr = cextend.Dlopen(name, mode)
+	if d.addr == nil {
+		return nil, errors.New(cextend.Dlerror())
+	}
 	return
 }
 
 //关闭一个动态链接库
-func (d *DLL) Release() (err error) {
+func (d *DLL) Release() (err int) {
 	ret := cextend.Dlclose(d.addr)
-	retstr := strconv.Itoa(ret)
-	err = errors.New(retstr)
-	return
+	return ret
 }
 
 //寻找一个动态链接库中导出的过程
 func (d *DLL) FindProc(name string) (proc uintptr, err error) {
 	var ptr unsafe.Pointer
-	ptr = cextend.Dlsym(name)
+	ptr = cextend.Dlsym(d.addr, name)
 	if ptr == nil {
-		return 0, errors.New("Find fail")
+		return 0, errors.New(cextend.Dlerror())
 	}
 	return uintptr(ptr), nil
 }

@@ -1,7 +1,6 @@
 package sys
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -9,7 +8,7 @@ func TestNewMmap(t *testing.T) {
 	defer func() {
 		err := recover()
 		if err != nil {
-			fmt.Println(err)
+			t.Fatal(err)
 		}
 	}()
 	mmap, err := NewMmap("./test/mmap_test.txt", 0)
