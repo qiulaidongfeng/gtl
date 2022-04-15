@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"unsafe"
 
-	"gitee.com/qiulaidongfeng/gtl/cextend"
+	"github.com/qiulaidongfeng/gtl/cextend"
 )
 
 const (
