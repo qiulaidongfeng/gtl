@@ -22,3 +22,27 @@ func TestNewMmap(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func BenchmarkNewMmap(b *testing.B) {
+	b.SetBytes(2)
+	b.ReportAllocs()
+	defer func() {
+		err := recover()
+		if err != nil {
+			b.Fatal(err)
+		}
+	}()
+	for i := 0; i < b.N; i++ {
+		mmap, err := NewMmap("./test/mmap_test.txt", 0)
+		defer func() {
+			err := mmap.Close()
+			if err != nil {
+				b.Fatal(err)
+			}
+		}()
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+
+}

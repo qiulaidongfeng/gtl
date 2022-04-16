@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"unsafe"
 
-	"github.com/qiulaidongfeng/gtl/cextend"
+	"gtl/cextend"
 )
 
 const (
@@ -62,6 +62,12 @@ func (d *DLL) Release() (err int) {
 	return ret
 }
 
+//关闭一个动态链接库
+func (d *DLL) Close() (err int) {
+	ret := cextend.Dlclose(d.addr)
+	return ret
+}
+
 //寻找一个动态链接库中导出的过程
 func (d *DLL) FindProc(name string) (proc uintptr, err error) {
 	var ptr unsafe.Pointer
@@ -70,21 +76,6 @@ func (d *DLL) FindProc(name string) (proc uintptr, err error) {
 		return 0, errors.New(cextend.Dlerror())
 	}
 	return uintptr(ptr), nil
-}
-
-//调用指定名称的动态链接库中导出的过程
-func (d *DLL) Call(name string, a ...uintptr) (r1, r2 uintptr, err error) {
-	var procaddr uintptr
-	procaddr, err = d.FindProc(name)
-	if err != nil {
-		return 0, 0, err
-	}
-	return syscall.SyscallN(procaddr, a...)
-}
-
-//调用已知地址的动态链接库中导出的过程
-func Call(procaddr uintptr, a ...uintptr) (r1, r2 uintptr, err Errno) {
-	return syscall.SyscallN(procaddr, a...)
 }
 
 func (d *DLL) String() string {

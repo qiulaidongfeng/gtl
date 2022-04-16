@@ -1,7 +1,6 @@
 package sys
 
 import (
-	"fmt"
 	"os"
 
 	"golang.org/x/sys/windows"
@@ -112,8 +111,6 @@ func NewMmapAll(path string, osflag int, perm os.FileMode, length uint, prot uin
 	}
 	m1.addr, err = windows.MapViewOfFile(m1.mmaphandle, fileflag, 0, 0, 0)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
 		return nil, err
 	}
 	m = m1

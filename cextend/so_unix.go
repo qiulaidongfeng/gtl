@@ -1,7 +1,7 @@
-//go:build linux
-// +build linux
+//go:build !windows
+// +build !windows
 
-package main
+package cextend
 
 import (
 	"unsafe"
