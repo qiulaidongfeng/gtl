@@ -1,3 +1,4 @@
+//	注意，本包因为绕开了go语言安全机制，导入不安全的软件包可能是不可移植的，并且不受Go 1兼容性指南的保护。
 package gunsafe
 
 import "unsafe"
