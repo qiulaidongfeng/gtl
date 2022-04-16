@@ -19,5 +19,5 @@ func Setbit1[T constraints.Integer](x, index T) T {
 
 //设置从右起第index位的值位0,index>=0
 func Setbit0[T constraints.Integer](x, index T) T {
-	return x & (0 << index)
+	return x & (^(1 << index))
 }

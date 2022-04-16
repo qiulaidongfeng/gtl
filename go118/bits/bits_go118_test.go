@@ -8,25 +8,25 @@ import (
 	"testing"
 )
 
-type int64bits_setbit1 struct {
-	in    int64
-	newin int64
+type int16bits_setbit1 struct {
+	in    int16
+	newin int16
 }
 
-func newint64bits_setbit1(in int64) int64bits_setbit1 {
-	b := int64bits_setbit1{
+func newint16bits_setbit1(in int16) *int16bits_setbit1 {
+	b := &int16bits_setbit1{
 		in: in,
 	}
 	return b
 }
 
-func (b int64bits_setbit1) Setbit1(index int64) int64 {
-	b.newin = Setbit1(b.in, int64(index))
+func (b *int16bits_setbit1) Setbit1(index int16) int16 {
+	b.newin = Setbit1(b.in, index)
 	return b.newin
 }
 
-func (b int64bits_setbit1) Check(indexr1 int64) (ok bool) {
-	for index := int64(0); index < 64; index++ {
+func (b *int16bits_setbit1) Check(indexr1 int16) bool {
+	for index := int16(0); index < 16; index++ {
 		inbit := Getbit(b.in, index)
 		newbit := Getbit(b.newin, index)
 		if inbit == newbit {
@@ -35,19 +35,66 @@ func (b int64bits_setbit1) Check(indexr1 int64) (ok bool) {
 		if index == indexr1 {
 			continue
 		}
-		ok = false
+		return false
 	}
 	return true
 }
 
-func FuzzGetbit_Int64(f *testing.F) {
-	for _, value := range []int64{rand.Int63(), rand.Int63(), rand.Int63()} {
+func FuzzSetbit1_Int16(f *testing.F) {
+	for _, value := range []int16{int16(rand.Int31n(1 << 16)), int16(rand.Int31n(1 << 16)), 0} {
 		f.Add(value)
 	}
-	f.Fuzz(func(t *testing.T, in int64) {
-		index := rand.Int63n(63)
-		bstruct := newint64bits_setbit1(in)
+	f.Fuzz(func(t *testing.T, in int16) {
+		index := int16(rand.Int31n(16))
+		bstruct := newint16bits_setbit1(in)
 		bitold := bstruct.Setbit1(index)
+		ok := bstruct.Check(index)
+		if !ok {
+			t.Fatalf("%d位\n%b\n%b\n%s", index, in, bitold, "比特位值获取不正确！")
+		}
+	})
+}
+
+type int16bits_setbit0 struct {
+	in    int16
+	newin int16
+}
+
+func newint16bits_setbit0(in int16) *int16bits_setbit0 {
+	b := &int16bits_setbit0{
+		in: in,
+	}
+	return b
+}
+
+func (b *int16bits_setbit0) Setbit0(index int16) int16 {
+	b.newin = Setbit0(b.in, index)
+	return b.newin
+}
+
+func (b *int16bits_setbit0) Check(indexr0 int16) bool {
+	for index := int16(0); index < 16; index++ {
+		inbit := Getbit(b.in, index)
+		newbit := Getbit(b.newin, index)
+		if inbit == newbit {
+			continue
+		}
+		if index == indexr0 {
+			continue
+		}
+		return false
+	}
+	return true
+}
+
+func FuzzSetbit0_Int16(f *testing.F) {
+	for _, value := range []int16{int16(rand.Int31n(1 << 16)), int16(rand.Int31n(1 << 16)), 0} {
+		f.Add(value)
+	}
+	f.Fuzz(func(t *testing.T, in int16) {
+		index := int16(rand.Int31n(16))
+		bstruct := newint16bits_setbit0(in)
+		bitold := bstruct.Setbit0(index)
 		ok := bstruct.Check(index)
 		if !ok {
 			t.Fatalf("%d位\n%b\n%b\n%s", index, in, bitold, "比特位值获取不正确！")
@@ -99,12 +146,24 @@ func TestSetbit0_Int64(t *testing.T) {
 func BenchmarkGetbit_Int64(b *testing.B) {
 	b.SetBytes(99)
 	b.ReportAllocs()
-	a := int64(1)
-	a = a << 32
+	a := 1 << 32
 	for i := int64(1); i < int64(b.N); i++ {
-		bit := Getbit(a, 32)
-		if bit != 1 {
-			b.Fatal(i, "比特位值设置不正确！")
-		}
+		_ = Getbit(a, 32)
+	}
+}
+func BenchmarkSetbit1_Int64(b *testing.B) {
+	b.SetBytes(99)
+	b.ReportAllocs()
+	a := rand.Int63()
+	for i := int64(1); i < int64(b.N); i++ {
+		_ = Setbit1(a, 32)
+	}
+}
+func BenchmarkSetbit0_Int64(b *testing.B) {
+	b.SetBytes(99)
+	b.ReportAllocs()
+	a := rand.Int63()
+	for i := int64(1); i < int64(b.N); i++ {
+		_ = Setbit0(a, 32)
 	}
 }
