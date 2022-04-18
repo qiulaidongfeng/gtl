@@ -32,17 +32,11 @@ func (d *DLL) FindProc(name string) (proc uintptr, err error) {
 }
 
 //关闭一个动态链接库
-func (d *DLL) Release() (err error) {
-	syscall.FreeLibrary(d.dll)
-	return
-}
-
-//关闭一个动态链接库
 func (d *DLL) Close() (err error) {
 	syscall.FreeLibrary(d.dll)
 	return
 }
 
 func (d *DLL) String() string {
-	return d.name + ":DLL"
+	return d.name + ".DLL"
 }

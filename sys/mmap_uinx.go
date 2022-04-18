@@ -1,5 +1,5 @@
-//go:build aix || darwin || freebsd || linux || netbsd || openbsd || solaris || dragonfly
-// +build aix darwin freebsd linux netbsd openbsd solaris dragonfly
+//go:build !windows
+// +build !windows
 
 package sys
 
@@ -7,17 +7,22 @@ import (
 	"os"
 	"unsafe"
 
-	"golang.org/x/sys/unix"
+	"syscall"
 )
 
 const (
 	//页面可读取
-	READ = unix.PROT_READ
+	READ = syscall.PROT_READ
 	//页面可写入
-	WRITE = unix.PROT_WRITE
-	//页面可执行
-	EXEC = unix.PROT_EXEC
-	RWX  = READ | WRITE | EXEC
+	WRITE = syscall.PROT_WRITE
+	RWX   = READ | WRITE
+)
+
+const (
+	//写入数据复制回文件内，允许其他映射该文件的进程共享
+	SHARED = syscall.MAP_SHARED
+	//写入时复制,写入操作会产生映射文件的复制，对此的任何修改都不会写入文件
+	PRIVATE = syscall.MAP_PRIVATE
 )
 
 //内存映射的结构体
@@ -29,42 +34,25 @@ type Mmap struct {
 
 //以读写模式打开文件，0777权限位，可读可写可执行
 func NewMmap(path string, length int) (m *Mmap, err error) {
-	NewMmapAll(path, os.O_RDWR|os.O_CREATE, 0777, length, RWX, unix.MAP_SHARED)
+	NewMmapAll(path, os.O_RDWR|os.O_CREATE, 0777, length, RWX, SHARED)
 	return
-	/*//打开文件
-	m.file, err = os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0777)
-	if err != nil {
-		return nil, err
-	}
-	//改变文件大小为length
-	err = m.file.Truncate(int64(length))
-	if err != nil {
-		return nil, err
-	}
-	m.length = length
-	//进行系统调用实现共享内存
-	m.memory, err = unix.Mmap(int(m.file.Fd()), 0, length, RWX, unix.MAP_SHARED)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil*/
 }
 
 //以自定义模式与自定义权限位打开文件，自定义是否读写执行
 func NewMmapAll(path string, osflag int, perm os.FileMode, length int, prot int, fileflag int) (m *Mmap, err error) {
 	//打开文件
-	m.file, err = os.OpenFile(path, os, perm)
+	m.file, err = os.OpenFile(path, osflag, perm)
 	if err != nil {
 		return nil, err
 	}
 	//改变文件大小为length
-	_, err = m1.file.Seek(0, 0)
+	_, err = m.file.Seek(0, 0)
 	if err != nil {
 		return nil, err
 	}
 	m.length = length
 	//进行系统调用实现共享内存
-	m.memory, err = unix.Mmap(int(m.file.Fd()), 0, length, prot, fileflag)
+	m.memory, err = syscall.Mmap(int(m.file.Fd()), 0, length, prot, fileflag)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +61,7 @@ func NewMmapAll(path string, osflag int, perm os.FileMode, length int, prot int,
 
 //关闭内存映射
 func (m *Mmap) Close() (err error) {
-	err = unix.Munmap(m.memory) //释放已映射空间
+	err = syscall.Munmap(m.memory) //释放已映射空间
 	if err != nil {
 		return err
 	}

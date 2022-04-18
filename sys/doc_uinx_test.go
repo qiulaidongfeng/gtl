@@ -1,5 +1,5 @@
-//go:build aix || darwin || freebsd || linux || netbsd || openbsd || solaris || dragonfly
-// +build aix darwin freebsd linux netbsd openbsd solaris dragonfly
+//go:build !windows
+// +build !windows
 
 package sys
 
