@@ -9,7 +9,6 @@ import (
 
 // #cgo CFLAGS: -g -O3 -march=corei7
 // #cgo LDFLAGS: -ldl
-
 /*
 	#include <dlfcn.h>
 */

@@ -24,7 +24,7 @@ func NewDLLAll(name string, mode int) (d *DLL, err error) {
 	d.name = name
 	d.addr = Dlopen(name, mode)
 	if d.addr == nil {
-		return nil, errors.New(cextend.Dlerror())
+		return nil, errors.New(Dlerror())
 	}
 	return
 }
@@ -43,7 +43,7 @@ func (d *DLL) FindProc(name string) (proc uintptr, err error) {
 	var ptr unsafe.Pointer
 	ptr = Dlsym(d.addr, name)
 	if ptr == nil {
-		return 0, errors.New(cextend.Dlerror())
+		return 0, errors.New(Dlerror())
 	}
 	return uintptr(ptr), nil
 }

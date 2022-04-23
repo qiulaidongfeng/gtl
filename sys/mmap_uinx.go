@@ -40,6 +40,7 @@ func NewMmap(path string, length int) (m *Mmap, err error) {
 
 //以自定义模式与自定义权限位打开文件，自定义是否读写执行
 func NewMmapAll(path string, osflag int, perm os.FileMode, length int, prot int, fileflag int) (m *Mmap, err error) {
+	m = new(Mmap)
 	//打开文件
 	m.file, err = os.OpenFile(path, osflag, perm)
 	if err != nil {
