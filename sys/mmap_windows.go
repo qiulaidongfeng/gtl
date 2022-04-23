@@ -2,7 +2,6 @@ package sys
 
 import (
 	"os"
-
 	"syscall"
 )
 

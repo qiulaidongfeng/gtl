@@ -5,9 +5,8 @@ package sys
 
 import (
 	"os"
-	"unsafe"
-
 	"syscall"
+	"unsafe"
 )
 
 const (
@@ -15,7 +14,7 @@ const (
 	READ = syscall.PROT_READ
 	//页面可写入
 	WRITE = syscall.PROT_WRITE
-	RWX   = READ | WRITE
+	RW    = READ | WRITE
 )
 
 const (
@@ -23,6 +22,10 @@ const (
 	SHARED = syscall.MAP_SHARED
 	//写入时复制,写入操作会产生映射文件的复制，对此的任何修改都不会写入文件
 	PRIVATE = syscall.MAP_PRIVATE
+)
+
+var (
+	Pagesize = os.Getpagesize()
 )
 
 //内存映射的结构体
@@ -34,8 +37,8 @@ type Mmap struct {
 
 //以读写模式打开文件，0777权限位，可读可写可执行
 func NewMmap(path string, length int) (m *Mmap, err error) {
-	NewMmapAll(path, os.O_RDWR|os.O_CREATE, 0777, length, RWX, SHARED)
-	return
+	m, err = NewMmapAll(path, os.O_RDWR|os.O_CREATE, 0777, length, RW, SHARED)
+	return m, err
 }
 
 //以自定义模式与自定义权限位打开文件，自定义是否读写执行
