@@ -1,12 +1,14 @@
 //go:build !windows
 // +build !windows
 
-package cextend
+package sys
 
 import (
 	"unsafe"
 )
 
+// #cgo CFLAGS: -g -O3 -march=corei7
+// #cgo LDFLAGS: -ldl
 /*
 	#include <dlfcn.h>
 */

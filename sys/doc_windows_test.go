@@ -1,12 +1,9 @@
-//go:build !windows
-// +build !windows
-
 package sys
 
-func ExampleNewMmap_uinx() {
+func ExampleNewMmap_windows() {
 	path := "文件路径"
 	//文件映射起始地址离开头偏移量
-	length := 0
+	length := uint(0)
 	mmap, err := NewMmap(path, length)
 	//判断是否存在错误
 	if err != nil {

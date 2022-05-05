@@ -1,3 +1,6 @@
+//go:build !windows
+// +build !windows
+
 package sys
 
 import (
@@ -11,16 +14,16 @@ func TestNewMmap(t *testing.T) {
 			t.Fatal(err)
 		}
 	}()
-	mmap, err := NewMmap("./test/mmap_test.txt", 0)
+	mmap, err := NewMmap("./test/mmap_test.txt", Pagesize)
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer func() {
 		err := mmap.Close()
 		if err != nil {
 			t.Fatal(err)
 		}
 	}()
-	if err != nil {
-		t.Fatal(err)
-	}
 }
 
 func BenchmarkNewMmap(b *testing.B) {
@@ -33,16 +36,16 @@ func BenchmarkNewMmap(b *testing.B) {
 		}
 	}()
 	for i := 0; i < b.N; i++ {
-		mmap, err := NewMmap("./test/mmap_test.txt", 0)
+		mmap, err := NewMmap("./test/mmap_test.txt", Pagesize)
+		if err != nil {
+			b.Fatal(err)
+		}
 		defer func() {
 			err := mmap.Close()
 			if err != nil {
 				b.Fatal(err)
 			}
 		}()
-		if err != nil {
-			b.Fatal(err)
-		}
 	}
 
 }
