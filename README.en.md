@@ -1,26 +1,10 @@
 # golang tool library
 
 #### Description
-go语言的开源工具库
+Open source tool library of go language.
 
-#### Software Architecture
-Software architecture description
+#### Main warehouse
+Clone https://gitee.com/qiulaidongfeng/gtl
 
-#### Installation
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### Instructions
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### Contribution
-
-1.  Fork the repository
-2.  Create Feat_xxx branch
-3.  Commit your code
-4.  Create Pull Request
+#### issue
+Go to https://gitee.com/qiulaidongfeng/gtl/issues or Issue can be mentioned in GitHub
