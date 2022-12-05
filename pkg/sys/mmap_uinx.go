@@ -31,18 +31,18 @@ var (
 //内存映射的结构体
 type Mmap struct {
 	file   *os.File
-	length int
+	length uint
 	memory []byte
 }
 
 //以读写模式打开文件，0777权限位，可读可写可执行
-func NewMmap(path string, length int) (m *Mmap, err error) {
+func NewMmap(path string, length uint) (m *Mmap, err error) {
 	m, err = NewMmapAll(path, os.O_RDWR|os.O_CREATE, 0777, length, RW, SHARED)
 	return m, err
 }
 
 //以自定义模式与自定义权限位打开文件，自定义是否读写执行
-func NewMmapAll(path string, osflag int, perm os.FileMode, length int, prot int, fileflag int) (m *Mmap, err error) {
+func NewMmapAll(path string, osflag int, perm os.FileMode, length uint, prot int, fileflag int) (m *Mmap, err error) {
 	m = new(Mmap)
 	//打开文件
 	m.file, err = os.OpenFile(path, osflag, perm)
@@ -56,7 +56,7 @@ func NewMmapAll(path string, osflag int, perm os.FileMode, length int, prot int,
 	}
 	m.length = length
 	//进行系统调用实现共享内存
-	m.memory, err = syscall.Mmap(int(m.file.Fd()), 0, length, prot, fileflag)
+	m.memory, err = syscall.Mmap(int(m.file.Fd()), 0, int(length), prot, fileflag)
 	if err != nil {
 		return nil, err
 	}
