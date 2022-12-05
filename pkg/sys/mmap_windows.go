@@ -11,7 +11,7 @@ const (
 	//页面读写
 	PAGE_RW = syscall.PAGE_READWRITE
 	//页面可读，可写，可执行
-	PAGE_RE = syscall.PAGE_EXECUTE_READ
+	PAGE_RE = syscall.PAGE_EXECUTE_READWRITE
 	//写复制
 	PAGE_WRITECOPY = syscall.PAGE_EXECUTE_WRITECOPY
 )
@@ -52,7 +52,7 @@ func NewMmapAll(path string, osflag int, perm os.FileMode, length uint, prot uin
 	if err != nil {
 		return nil, err
 	}
-	//改变文件大小为length
+	//移动fd到开头
 	_, err = m1.file.Seek(0, 0)
 	if err != nil {
 		return nil, err
