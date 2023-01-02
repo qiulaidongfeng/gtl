@@ -11,14 +11,14 @@ const (
 	poppp  int64 = 1
 )
 
-//操作时间
+// 操作时间
 const (
 	Poptime  = int64(70)
 	Pushtime = int64(140)
 	Waittime = int64(200)
 )
 
-//类型大小
+// 类型大小
 const (
 	Int8size       uint64 = uint64((unsafe.Sizeof(int8(1))))
 	Int16size      uint64 = uint64((unsafe.Sizeof(int16(1))))

@@ -1,4 +1,4 @@
-//本包提供了增强的context
+// 本包提供了增强的context
 package context
 
 import (
@@ -16,10 +16,10 @@ type Map interface {
 	Load(key interface{}) (value interface{}, ok bool)
 }
 
-//为map[interface{}]interface{}实现Map
+// 为map[interface{}]interface{}实现Map
 type GoMap map[interface{}]interface{}
 
-//实现Map
+// 实现Map
 func (m GoMap) Load(key interface{}) (value interface{}, ok bool) {
 	value, ok = m[key]
 	return
@@ -41,7 +41,7 @@ func (m *mapContext) Value(key interface{}) interface{} {
 //go:linkname ctx_value context.value
 func ctx_value(c context.Context, key interface{}) interface{}
 
-//WithValue返回带有m的所有key,value的context.Context
+// WithValue返回带有m的所有key,value的context.Context
 func WithValue(parent context.Context, m Map) context.Context {
 	return &mapContext{Context: parent, m: m}
 

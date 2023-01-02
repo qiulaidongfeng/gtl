@@ -15,7 +15,7 @@ func Copy(dest, src unsafe.Pointer, n uint) {
 		n1 = n8 - n8n
 	}
 	off := 0
-	for i := uint(0); i < n8n; i++ {
+	for i := uint(0); i < n8; i++ {
 		*(*int64)((unsafe.Pointer(((uintptr)(dest)) + uintptr(off)))) = *(*int64)((unsafe.Pointer(((uintptr)(src)) + uintptr(off))))
 		off += 8
 	}

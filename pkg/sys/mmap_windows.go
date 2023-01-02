@@ -30,7 +30,7 @@ var (
 	Pagesize = uint(os.Getpagesize())
 )
 
-//内存映射的结构体
+// 内存映射的结构体
 type Mmap struct {
 	file       *os.File
 	mmaphandle Handle
@@ -38,13 +38,13 @@ type Mmap struct {
 	addr       uintptr
 }
 
-//以读写模式打开文件，0777权限位，可读可写
+// 以读写模式打开文件，0777权限位，可读可写
 func NewMmap(path string, length uint) (m *Mmap, err error) {
 	m, err = NewMmapAll(path, os.O_RDWR|os.O_CREATE, 0777, length, PAGE_RW, FILE_MAP_WRITE)
 	return
 }
 
-//以自定义模式与自定义权限位打开文件，自定义是否读写执行
+// 以自定义模式与自定义权限位打开文件，自定义是否读写执行
 func NewMmapAll(path string, osflag int, perm os.FileMode, length uint, prot uint32, fileflag uint32) (m *Mmap, err error) {
 	var m1 *Mmap = new(Mmap)
 	//打开文件
@@ -77,7 +77,7 @@ func NewMmapAll(path string, osflag int, perm os.FileMode, length uint, prot uin
 	return m, nil
 }
 
-//关闭内存映射
+// 关闭内存映射
 func (m *Mmap) Close() (err error) {
 	err = syscall.UnmapViewOfFile(m.addr) //释放已映射空间
 	if err != nil {
@@ -94,7 +94,7 @@ func (m *Mmap) Close() (err error) {
 	return nil
 }
 
-//返回内存映射的空间首地址
+// 返回内存映射的空间首地址
 func (m *Mmap) Addr() uintptr {
 	return m.addr
 }

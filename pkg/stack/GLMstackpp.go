@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-//记录为入栈时操作
+// 记录为入栈时操作
 func (s *GLMstack) pushrecord() {
 	atomic.AddInt64(&s.pushn, 1)
 	for {
@@ -26,7 +26,7 @@ func (s *GLMstack) pushrecord() {
 	}
 }
 
-//入栈已完成
+// 入栈已完成
 func (s *GLMstack) pushok() {
 	n := atomic.AddInt64(&s.pushn, -1)
 	if n == 0 {
@@ -34,7 +34,7 @@ func (s *GLMstack) pushok() {
 	}
 }
 
-//出栈已完成
+// 出栈已完成
 func (s *GLMstack) popok() {
 	n := atomic.AddInt64(&s.popn, -1)
 	if n == 0 {
@@ -42,7 +42,7 @@ func (s *GLMstack) popok() {
 	}
 }
 
-//记录为出栈时操作
+// 记录为出栈时操作
 func (s *GLMstack) poprecord() {
 	atomic.AddInt64(&s.popn, 1)
 	for {

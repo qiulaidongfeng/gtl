@@ -41,23 +41,23 @@ const (
 	RTLD_LOCAL = C.RTLD_LOCAL
 )
 
-//C语言#include <dlfcn.h>提供的dlopen函数的go语言API
+// C语言#include <dlfcn.h>提供的dlopen函数的go语言API
 func Dlopen(file string, mode int) (ptr unsafe.Pointer) {
 	return C.dlopen(C.CString(file), C.int(mode))
 }
 
-//C语言#include <dlfcn.h>提供的dlsym函数的go语言API
+// C语言#include <dlfcn.h>提供的dlsym函数的go语言API
 func Dlsym(handle unsafe.Pointer, name string) (ptr unsafe.Pointer) {
 	return C.dlsym(handle, C.CString(name))
 }
 
-//C语言#include <dlfcn.h>提供的dlclose函数的go语言API
+// C语言#include <dlfcn.h>提供的dlclose函数的go语言API
 func Dlclose(handle unsafe.Pointer) int {
 	ret := C.dlclose(handle)
 	return int(ret)
 }
 
-//C语言#include <dlfcn.h>提供的dlerror函数的go语言API
+// C语言#include <dlfcn.h>提供的dlerror函数的go语言API
 func Dlerror() string {
 	ret := C.dlerror()
 	return C.GoString(ret)

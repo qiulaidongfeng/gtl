@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-//链表中某一元素
+// 链表中某一元素
 type Element struct {
 	value   interface{}
 	NextOne *Element
@@ -61,16 +61,16 @@ func (e *Element) String() string {
 	return fmt.Sprintf("%s", e.value)
 }
 
-//单链表的实现
+// 单链表的实现
 type SingleLinkedList struct {
 	node *Element
 	len  uint64
 }
 
-//单链表的实现
+// 单链表的实现
 type Slist = SingleLinkedList
 
-//创建单链表
+// 创建单链表
 func NewSlist() Slist {
 	n := Slist{
 		len: 0,

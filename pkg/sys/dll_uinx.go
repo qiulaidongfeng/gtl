@@ -8,18 +8,18 @@ import (
 	"unsafe"
 )
 
-//动态链接库结构体
+// 动态链接库结构体
 type DLL struct {
 	name string
 	addr unsafe.Pointer
 }
 
-//打开一个动态链接库
+// 打开一个动态链接库
 func NewDLL(name string) (d *DLL, err error) {
 	return NewDLLAll(name, RTLD_NOW)
 }
 
-//打开一个动态链接库,以指定的mode
+// 打开一个动态链接库,以指定的mode
 func NewDLLAll(name string, mode int) (d *DLL, err error) {
 	d.name = name
 	d.addr = Dlopen(name, mode)
@@ -29,7 +29,7 @@ func NewDLLAll(name string, mode int) (d *DLL, err error) {
 	return
 }
 
-//关闭一个动态链接库
+// 关闭一个动态链接库
 func (d *DLL) Close() (errint int, err error) {
 	ret := Dlclose(d.addr)
 	if ret != 0 {
@@ -38,7 +38,7 @@ func (d *DLL) Close() (errint int, err error) {
 	return ret, nil
 }
 
-//寻找一个动态链接库中导出的过程
+// 寻找一个动态链接库中导出的过程
 func (d *DLL) FindProc(name string) (proc uintptr, err error) {
 	var ptr unsafe.Pointer
 	ptr = Dlsym(d.addr, name)
