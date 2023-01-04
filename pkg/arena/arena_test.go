@@ -21,7 +21,7 @@ func TestAlloc(t *testing.T) {
 	a := NewArena(unsafe.Sizeof(user{}))
 	var wg *sync.WaitGroup = new(sync.WaitGroup)
 	var sema = make(chan struct{}, 8100)
-	for i := 0; i < 8000-1; i++ {
+	for i := 0; i < 8100; i++ {
 		sema <- struct{}{}
 	}
 	for i := 0; i < n; i++ {
