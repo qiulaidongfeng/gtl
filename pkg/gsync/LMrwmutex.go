@@ -15,16 +15,19 @@ var (
 )
 
 const (
-	nolock    = 0
-	writelock = -1
+	nolock    int64 = 0
+	writelock int64 = -1 << 63
 )
 
 type nocopy struct{}
 
+func (_ nocopy) Lock()   {}
+func (_ nocopy) Unlock() {}
+
 // 使用内存少的读写锁，不能复制
 type LowMemory_rwMutex struct {
-	_  nocopy
-	nm int64
+	_     nocopy
+	state int64
 }
 
 // 使用内存少的读写锁，不能复制
@@ -33,8 +36,7 @@ type LMrwmutex = LowMemory_rwMutex
 // 获取写锁
 func (m *LMrwmutex) Lock() {
 	for {
-		ok := atomic.CompareAndSwapInt64(&m.nm, nolock, writelock)
-		if ok == true {
+		if atomic.CompareAndSwapInt64(&m.state, nolock, writelock) {
 			break
 		}
 		runtime.Gosched()
@@ -43,33 +45,25 @@ func (m *LMrwmutex) Lock() {
 
 // 释放写锁
 func (m *LMrwmutex) Unlock() {
-	nm := atomic.LoadInt64(&m.nm)
-	if nm >= 0 {
+	if !atomic.CompareAndSwapInt64(&m.state, writelock, nolock) {
 		panic(Nowritelock)
 	}
-	atomic.StoreInt64(&m.nm, nolock)
 }
 
 // 获取读锁
 func (m *LMrwmutex) RLock() {
 	for {
-		ok := atomic.CompareAndSwapInt64(&m.nm, writelock, writelock)
-		if ok == true {
-			runtime.Gosched()
-			continue
+		if atomic.AddInt64(&m.state, 1) > 0 { //如果现在是读锁
+			return
 		}
-		atomic.AddInt64(&m.nm, 1)
-		break
+		atomic.AddInt64(&m.state, -1)
+		runtime.Gosched()
 	}
 }
 
 // 释放读锁
 func (m *LMrwmutex) RUnlock() {
-	nm := atomic.LoadInt64(&m.nm)
-	if nm == -1 {
-		panic(Noreadlock)
-	} else if nm == 0 {
+	if atomic.AddInt64(&m.state, -1) < 0 {
 		panic(Noreadlock)
 	}
-	atomic.AddInt64(&m.nm, -1)
 }
